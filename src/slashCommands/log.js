@@ -14,6 +14,7 @@ module.exports = {
       const feeding = getMostRecentFeeding();
       const finishedMostRecentFeeding = !feeding || !!feeding?.endTime;
       const mostRecentSide = feeding?.side;
+      const isPaused = !feeding || !!feeding?.pauseTime;
       if (finishedMostRecentFeeding) {
         const confirm = new ButtonBuilder()
           .setCustomId('feeding')
@@ -45,9 +46,22 @@ module.exports = {
           .setLabel('I forgot')
           .setEmoji('😳')
           .setStyle(ButtonStyle.Danger);
+        const pauseButton = new ButtonBuilder()
+          .setCustomId('pauseButton')
+          .setLabel('Pause feeding')
+          .setEmoji('⏸️')
+          .setStyle(ButtonStyle.Primary);
+        const resumeButton = new ButtonBuilder()
+          .setCustomId('resumeButton')
+          .setLabel('Resume feeding')
+          .setEmoji('▶️')
+          .setStyle(ButtonStyle.Primary);
+        const dynamicActionButton = isPaused ? resumeButton : pauseButton;
+
         const endFeedingButtons = new ActionRowBuilder().addComponents(
           finishButton,
-          forgotButton
+          forgotButton,
+          dynamicActionButton
         );
         await interaction.reply({
           content: `Would you like to end the most recent feeding on the ${mostRecentSide} side?`,

@@ -24,8 +24,16 @@ function buildTimestamp(time) {
   return `${hours}:${minutes}${ampm}`;
 }
 
-function buildFeedEmoji(start, side) {
-  return `${start ? '🍼' : '🏁'}${side === 'left' ? '👈' : '👉'}`;
+function buildFeedEmoji(type, side) {
+  return `${
+    type === 'start'
+      ? '🍼'
+      : type === 'pause'
+      ? '⏸️'
+      : type === 'resume'
+      ? '▶️'
+      : '🏁'
+  }${side === 'left' ? '👈' : '👉'}`;
 }
 
 function buildNextFeedTime(endTime) {
@@ -200,9 +208,16 @@ module.exports = () => {
               .setEmoji('👉')
               .setStyle(ButtonStyle.Success);
 
+            // const manualStartButton = new ButtonBuilder()
+            //   .setCustomId('manualStartButton')
+            //   .setLabel('Manual')
+            //   .setEmoji('🍼')
+            //   .setStyle(ButtonStyle.Primary);
+
             const feedingButtons = new ActionRowBuilder().addComponents(
               leftBoob,
-              rightBoob
+              rightBoob,
+              // manualStartButton
             );
             await interaction.message.delete();
             await interaction.reply({
@@ -220,7 +235,7 @@ module.exports = () => {
             await interaction.message.delete();
             await interaction.reply({
               content: `${buildFeedEmoji(
-                true,
+                'start',
                 'left'
               )} Feeding started on left side at ${buildTimestamp(time)}`,
             });
@@ -234,20 +249,24 @@ module.exports = () => {
             await interaction.message.delete();
             await interaction.reply({
               content: `${buildFeedEmoji(
-                true,
+                'start',
                 'right'
               )} Feeding started on right side at ${buildTimestamp(time)}`,
             });
             break;
           case 'finishButton':
+            const deductions =
+              feeding?.deductions?.reduce((sum, current) => sum + current, 0) ||
+              0;
             const duration = Math.floor(
-              (time - feeding.startTime) / (1000 * 60)
+              (feeding?.pauseTime || time - feeding.startTime - deductions) /
+                (1000 * 60)
             );
             saveLog({
               feedings: {
                 [feeding.startTime]: {
                   ...feeding,
-                  endTime: time,
+                  endTime: feeding?.pauseTime || time,
                 },
               },
             });
@@ -256,10 +275,49 @@ module.exports = () => {
                 false,
                 side
               )} Finished feeding on ${side} side at ${buildTimestamp(
-                time
+                feeding?.pauseTime || time
               )}. Feeding on ${side} lasted ${duration} minutes ${buildNextFeedTime(
                 time
               )}`,
+            });
+            await interaction.message.delete();
+            break;
+          case 'pauseButton':
+            saveLog({
+              feedings: {
+                [feeding.startTime]: {
+                  ...feeding,
+                  pauseTime: time,
+                },
+              },
+            });
+            await interaction.reply({
+              content: `${buildFeedEmoji(
+                'pause',
+                side
+              )} Paused feeding on ${side} side at ${buildTimestamp(time)}.`,
+            });
+            await interaction.message.delete();
+            break;
+          case 'resumeButton':
+            const pauseDuration = time - feeding.pauseTime;
+            const pauseDurationInMinutes = pauseDuration / (1000 * 60);
+            saveLog({
+              feedings: {
+                [feeding.startTime]: {
+                  ...feeding,
+                  pauseTime: null,
+                  deductions: [...(feeding?.deductions || []), pauseDuration],
+                },
+              },
+            });
+            await interaction.reply({
+              content: `${buildFeedEmoji(
+                'resume',
+                side
+              )} Paused for ${pauseDurationInMinutes} minutes. Resume feeding on ${side} side at ${buildTimestamp(
+                time
+              )}.`,
             });
             await interaction.message.delete();
             break;
@@ -588,10 +646,10 @@ module.exports = () => {
                 break;
               default:
                 console.log('Unknown value');
-                await interaction.message.delete();
-                await interaction.reply({
-                  content: 'Unable to update the log 😞',
-                });
+                // await interaction.message.delete();
+                // await interaction.reply({
+                //   content: 'Unable to update the log 😞',
+                // });
                 break;
             }
             break;
@@ -656,10 +714,10 @@ module.exports = () => {
             break;
           default:
             console.log('Unknown id');
-            await interaction.message.delete();
-            await interaction.reply({
-              content: 'Unable to update the log 😞',
-            });
+            // await interaction.message.delete();
+            // await interaction.reply({
+            //   content: 'Unable to update the log 😞',
+            // });
             break;
         }
 

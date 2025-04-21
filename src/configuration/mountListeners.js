@@ -4,9 +4,16 @@ const {
   ActionRowBuilder,
   ButtonBuilder,
   ButtonStyle,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
 } = require('discord.js');
 const messageListeners = require('../events');
-const { saveLog, loadLogs } = require('../utilities/logger');
+const {
+  saveLog,
+  getMostRecentFeeding,
+  loadLogs,
+  getAverageFeedingTimeBySide,
+} = require('../utilities/logger');
 
 module.exports = () => {
   // **************************
@@ -135,6 +142,15 @@ module.exports = () => {
   // **************************
   client.on('interactionCreate', async (interaction) => {
     const interactionType = InteractionType[interaction.type];
+    const feeding = getMostRecentFeeding();
+    const time = new Date().getTime();
+    const side = feeding?.side;
+    const averageFeedingTimeInMinutes = getAverageFeedingTimeBySide(side);
+    let endTime;
+    let endDate;
+    let hours;
+    let minutes;
+    let ampm;
 
     switch (interactionType) {
       case 'Ping':
@@ -183,9 +199,10 @@ module.exports = () => {
             });
             break;
           case 'leftBoob':
-            // const { feedings } = loadLogs();
             saveLog({
-              feedings: { [new Date().getTime()]: { side: 'left' } },
+              feedings: {
+                [time]: { side: 'left', startTime: time },
+              },
             });
             await interaction.message.delete();
             await interaction.reply({
@@ -194,14 +211,349 @@ module.exports = () => {
             break;
           case 'rightBoob':
             saveLog({
-              feedings: { [new Date().getTime()]: { side: 'right' } },
+              feedings: {
+                [time]: { side: 'right', startTime: time },
+              },
             });
             await interaction.message.delete();
             await interaction.reply({
               content: 'Updated log!',
             });
             break;
+          case 'finishButton':
+            saveLog({
+              feedings: {
+                [feeding.startTime]: {
+                  ...feeding,
+                  endTime: new Date().getTime(),
+                },
+              },
+            });
+            await interaction.reply({
+              content: 'Updated log!',
+            });
+            await interaction.message.delete();
+            break;
+          case 'forgotButton':
+            const select = new StringSelectMenuBuilder()
+              .setCustomId('customTime')
+              .setPlaceholder(
+                `Roughly how long did she feed on the ${
+                  feeding?.side || 'most recent'
+                } side?`
+              )
+              .addOptions(
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('No idea')
+                  .setValue('idk'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('10 mins')
+                  .setValue('10'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('15 mins')
+                  .setValue('15'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('20 mins')
+                  .setValue('20'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('25 mins')
+                  .setValue('25'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('30 mins')
+                  .setValue('30'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('35 mins')
+                  .setValue('35'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('40 mins')
+                  .setValue('40'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('45 mins')
+                  .setValue('45'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('50 mins')
+                  .setValue('50'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('55 mins')
+                  .setValue('55'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('60 mins')
+                  .setValue('60')
+              );
 
+            const row = new ActionRowBuilder().addComponents(select);
+            await interaction.message.delete();
+            await interaction.reply({
+              content: 'Lets set a manual end time real quick',
+              components: [row],
+              withResponse: true,
+            });
+            break;
+          case 'customTime':
+            switch (interaction.values[0]) {
+              case 'idk':
+                endTime =
+                  feeding.startTime + averageFeedingTimeInMinutes * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes}${ampm} to give the feeding the average time of ${averageFeedingTimeInMinutes} for the ${side} side.`,
+                });
+                break;
+              case '10':
+                endTime = feeding.startTime + 10 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 10 minutes.`,
+                });
+                break;
+              case '15':
+                endTime = feeding.startTime + 15 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 15 minutes.`,
+                });
+                break;
+              case '20':
+                endTime = feeding.startTime + 20 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 20 minutes.`,
+                });
+                break;
+              case '25':
+                endTime = feeding.startTime + 25 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 25 minutes.`,
+                });
+                break;
+              case '30':
+                endTime = feeding.startTime + 30 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 30 minutes.`,
+                });
+                break;
+              case '35':
+                endTime = feeding.startTime + 35 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 35 minutes.`,
+                });
+                break;
+              case '40':
+                endTime = feeding.startTime + 40 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 40 minutes.`,
+                });
+                break;
+              case '45':
+                endTime = feeding.startTime + 45 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 45 minutes.`,
+                });
+                break;
+              case '50':
+                endTime = feeding.startTime + 50 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 50 minutes.`,
+                });
+                break;
+              case '55':
+                endTime = feeding.startTime + 55 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 55 minutes.`,
+                });
+                break;
+              case '60':
+                endTime = feeding.startTime + 60 * 60 * 1000;
+                endDate = new Date(endTime);
+                hours = endDate.getHours();
+                minutes = endDate.getMinutes().toString().padStart(2, '0');
+                ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: `Set end time to ${hours}:${minutes} to give the feeding the length of 60 minutes.`,
+                });
+                break;
+              default:
+                console.log('Unknown value');
+                await interaction.message.delete();
+                await interaction.reply({
+                  content: 'Unable to update the log 😞',
+                });
+                break;
+            }
+            break;
           // diaper logic
           case 'diaperChange':
             const peeButton = new ButtonBuilder()

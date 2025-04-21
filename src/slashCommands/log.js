@@ -1,5 +1,6 @@
 const { client } = require('../configuration/bot');
 const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
+const { getMostRecentFeeding } = require('../utilities/logger');
 
 const { SlashCommandBuilder } = require('@discordjs/builders');
 
@@ -10,6 +11,50 @@ module.exports = {
 
   async execute(interaction) {
     try {
+      const feeding = getMostRecentFeeding();
+      const finishedMostRecentFeeding = !feeding || !!feeding?.endTime;
+      const mostRecentSide = feeding?.side;
+      if (finishedMostRecentFeeding) {
+        const confirm = new ButtonBuilder()
+          .setCustomId('feeding')
+          .setLabel('Feeding')
+          .setEmoji('🍼')
+          .setStyle(ButtonStyle.Success);
+
+        const cancel = new ButtonBuilder()
+          .setCustomId('diaperChange')
+          .setLabel('Diaper change')
+          .setEmoji('🧻')
+          .setStyle(ButtonStyle.Success);
+
+        const row = new ActionRowBuilder().addComponents(cancel, confirm);
+
+        await interaction.reply({
+          content: 'What event would you like to log?',
+          components: [row],
+          withResponse: true,
+        });
+      } else {
+        const finishButton = new ButtonBuilder()
+          .setCustomId('finishButton')
+          .setLabel('Finish now')
+          .setEmoji('🏁')
+          .setStyle(ButtonStyle.Success);
+        const forgotButton = new ButtonBuilder()
+          .setCustomId('forgotButton')
+          .setLabel('I forgot')
+          .setEmoji('😳')
+          .setStyle(ButtonStyle.Danger);
+        const endFeedingButtons = new ActionRowBuilder().addComponents(
+          finishButton,
+          forgotButton
+        );
+        await interaction.reply({
+          content: `Would you like to end the most recent feeding on the ${mostRecentSide} side?`,
+          components: [endFeedingButtons],
+          withResponse: true,
+        });
+      }
       const confirm = new ButtonBuilder()
         .setCustomId('feeding')
         .setLabel('Feeding')

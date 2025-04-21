@@ -8,7 +8,7 @@
   },
   "scripts": {
     "start": "node index",
-    "dev": "nodemon index",
+    "dev": "nodemon --ignore ./data/ index",
     "test": "echo \"Error: no test specified\" && exit 1",
     "postinstall": "npm link"
   },

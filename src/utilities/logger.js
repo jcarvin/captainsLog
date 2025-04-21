@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const dataPath = path.join(__dirname, '../../data/log-test.json');
+const dataPath = path.join(__dirname, '../../data/log.json');
 /*
 { 
   diaperChanges: { 123456: {type: 'pee' | 'poop' | 'both'}}
@@ -39,7 +39,7 @@ function getAverageFeedingTimeBySide(side) {
     { totalDuration: 0, count: 0 }
   );
   const averageDurationMs = count > 0 ? totalDuration / count : 0;
-  return averageDurationMs / (1000 * 60); // return in minutes
+  return Math.floor(averageDurationMs / (1000 * 60)); // return in minutes
 }
 
 function timeSinceLastFeeding() {

@@ -731,6 +731,7 @@ module.exports = () => {
 
       default:
         console.log(`Unknown interaction type: ${interactionType}`);
+        break;
     }
   });
 
@@ -762,7 +763,7 @@ module.exports = () => {
   });
 
   client.on('presenceUpdate', async (message) => {
-    console.log('presenceUpdate', message);
+    // console.log('presenceUpdate', message);
     messageListeners['userPresence']?.forEach((listener) => listener(message));
   });
 

@@ -16,7 +16,7 @@ const {
 
 function buildTimestamp(time) {
   const date = new Date(time);
-  let hours = date.getHours();
+  let hours = date.getHours() + 1; // adjust for thicks timezone
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const ampm = hours >= 12 ? 'PM' : 'AM';
   hours = hours % 12;
@@ -216,7 +216,7 @@ module.exports = () => {
 
             const feedingButtons = new ActionRowBuilder().addComponents(
               leftBoob,
-              rightBoob,
+              rightBoob
               // manualStartButton
             );
             await interaction.message.delete();

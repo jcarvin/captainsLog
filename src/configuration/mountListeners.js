@@ -259,7 +259,7 @@ module.exports = () => {
               feeding?.deductions?.reduce((sum, current) => sum + current, 0) ||
               0;
             const duration = Math.floor(
-              (feeding?.pauseTime || time - feeding.startTime - deductions) /
+              ((feeding?.pauseTime || time) - feeding.startTime - deductions) /
                 (1000 * 60)
             );
             saveLog({
@@ -277,7 +277,7 @@ module.exports = () => {
               )} Finished feeding on ${side} side at ${buildTimestamp(
                 feeding?.pauseTime || time
               )}. Feeding on ${side} lasted ${duration} minutes ${buildNextFeedTime(
-                time
+                feeding?.pauseTime || time
               )}`,
             });
             await interaction.message.delete();

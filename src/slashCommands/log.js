@@ -16,19 +16,29 @@ module.exports = {
       const mostRecentSide = feeding?.side;
       const isPaused = !feeding || !!feeding?.pauseTime;
       if (finishedMostRecentFeeding) {
-        const confirm = new ButtonBuilder()
+        const feedingButton = new ButtonBuilder()
           .setCustomId('feeding')
           .setLabel('Feeding')
           .setEmoji('🍼')
           .setStyle(ButtonStyle.Success);
 
-        const cancel = new ButtonBuilder()
+        const diaperButton = new ButtonBuilder()
           .setCustomId('diaperChange')
           .setLabel('Diaper change')
           .setEmoji('🧻')
           .setStyle(ButtonStyle.Success);
 
-        const row = new ActionRowBuilder().addComponents(cancel, confirm);
+        const fussyButton = new ButtonBuilder()
+          .setCustomId('fussyButton')
+          .setLabel('Fussy')
+          .setEmoji('😫')
+          .setStyle(ButtonStyle.Danger);
+
+        const row = new ActionRowBuilder().addComponents(
+          diaperButton,
+          feedingButton,
+          fussyButton
+        );
 
         await interaction.reply({
           content: 'What event would you like to log?',

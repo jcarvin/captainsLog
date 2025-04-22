@@ -722,6 +722,15 @@ module.exports = () => {
             // });
             break;
         }
+      case 'fussyButton':
+        saveLog({
+          fusses: { [time]: { type: 'madge' } },
+        });
+        await interaction.message.delete();
+        await interaction.reply({
+          content: `😫 Fussiness logged at ${buildTimestamp(time)}`,
+        });
+        break;
 
         break;
       case 'ApplicationCommandAutocomplete':

@@ -11,7 +11,10 @@ const dataPath = path.join(__dirname, '../../data/log.json');
 
 function loadLogs() {
   if (!fs.existsSync(dataPath)) {
-    fs.writeFileSync(dataPath, '{"diaperChanges": {}, "feedings": {}}');
+    fs.writeFileSync(
+      dataPath,
+      '{"diaperChanges": {}, "feedings": {}, "fusses": {}}'
+    );
   }
 
   const file = fs.readFileSync(dataPath);
@@ -47,10 +50,11 @@ function timeSinceLastFeeding() {
 }
 
 function saveLog(entry) {
-  const { diaperChanges, feedings } = loadLogs();
+  const { diaperChanges, feedings, fusses } = loadLogs();
   const newLogs = {
     diaperChanges: { ...diaperChanges, ...entry.diaperChanges },
     feedings: { ...feedings, ...entry.feedings },
+    fusses: { ...(fusses || {}), ...entry.fusses },
   };
   fs.writeFileSync(dataPath, JSON.stringify(newLogs, null, 2));
 }

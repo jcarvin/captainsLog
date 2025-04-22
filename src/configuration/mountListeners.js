@@ -274,9 +274,11 @@ module.exports = () => {
               content: `${buildFeedEmoji(
                 false,
                 side
-              )} Finished feeding on ${side} side at ${buildTimestamp(
+              )} Feeding on ${side} side started at ${buildTimestamp(
+                feeding?.startTime
+              )} finished at ${buildTimestamp(
                 feeding?.pauseTime || time
-              )}. Feeding on ${side} lasted ${duration} minutes ${buildNextFeedTime(
+              )}. Feeding lasted ${duration} minutes ${buildNextFeedTime(
                 feeding?.pauseTime || time
               )}`,
             });

@@ -6,6 +6,7 @@ const {
   ButtonStyle,
   StringSelectMenuBuilder,
   StringSelectMenuOptionBuilder,
+  EmbedBuilder,
 } = require('discord.js');
 const messageListeners = require('../events');
 const {
@@ -220,7 +221,7 @@ module.exports = () => {
               // manualStartButton
             );
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: 'What side did she feed from',
               components: [feedingButtons],
               withResponse: true,
@@ -233,7 +234,7 @@ module.exports = () => {
               },
             });
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: `${buildFeedEmoji(
                 'start',
                 'left'
@@ -247,7 +248,7 @@ module.exports = () => {
               },
             });
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: `${buildFeedEmoji(
                 'start',
                 'right'
@@ -270,7 +271,7 @@ module.exports = () => {
                 },
               },
             });
-            await interaction.reply({
+            await interaction.channel.send({
               content: `${buildFeedEmoji(
                 false,
                 side
@@ -293,7 +294,7 @@ module.exports = () => {
                 },
               },
             });
-            await interaction.reply({
+            await interaction.channel.send({
               content: `${buildFeedEmoji(
                 'pause',
                 side
@@ -313,7 +314,7 @@ module.exports = () => {
                 },
               },
             });
-            await interaction.reply({
+            await interaction.channel.send({
               content: `${buildFeedEmoji(
                 'resume',
                 side
@@ -372,7 +373,7 @@ module.exports = () => {
 
             const row = new ActionRowBuilder().addComponents(select);
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: 'Lets set a manual end time real quick',
               components: [row],
               withResponse: true,
@@ -393,7 +394,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -415,7 +416,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -437,7 +438,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -459,7 +460,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -481,7 +482,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -503,7 +504,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -525,7 +526,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -547,7 +548,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -569,7 +570,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -591,7 +592,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -613,7 +614,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -635,7 +636,7 @@ module.exports = () => {
                   },
                 });
                 await interaction.message.delete();
-                await interaction.reply({
+                await interaction.channel.send({
                   content: `${buildFeedEmoji(
                     false,
                     side
@@ -681,7 +682,7 @@ module.exports = () => {
               poopAndPeeButton
             );
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: "What was in the 'package'?",
               components: [diaperButtons],
               withResponse: true,
@@ -692,7 +693,7 @@ module.exports = () => {
               diaperChanges: { [time]: { type: 'pee' } },
             });
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: `💧 Pee logged at ${buildTimestamp(time)}`,
             });
             break;
@@ -701,7 +702,7 @@ module.exports = () => {
               diaperChanges: { [time]: { type: 'poop' } },
             });
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: `💩 Poop logged at ${buildTimestamp(time)}`,
             });
             break;
@@ -710,8 +711,65 @@ module.exports = () => {
               diaperChanges: { [time]: { type: 'both' } },
             });
             await interaction.message.delete();
-            await interaction.reply({
+            await interaction.channel.send({
               content: `💧/💩 Pee and poop logged at ${buildTimestamp(time)}`,
+            });
+            break;
+          // fussy logic
+          case 'fussyButton':
+            saveLog({
+              fusses: { [time]: { type: 'madge' } },
+            });
+            await interaction.message.delete();
+            await interaction.channel.send({
+              content: `😫 Fussiness logged at ${buildTimestamp(time)}`,
+            });
+            break;
+          // stats logic
+          case 'dailyButton': // inside a command, event listener, etc.
+            const exampleEmbed = new EmbedBuilder()
+              .setColor(0x0099ff)
+              .setTitle('Some title')
+              .setURL('https://discord.js.org/')
+              .setAuthor({
+                name: 'Some name',
+                iconURL: 'https://i.imgur.com/AfFp7pu.png',
+                url: 'https://discord.js.org',
+              })
+              .setDescription('Some description here')
+              .setThumbnail('https://i.imgur.com/AfFp7pu.png')
+              .addFields(
+                { name: 'Regular field title', value: 'Some value here' },
+                { name: '\u200B', value: '\u200B' },
+                {
+                  name: 'Inline field title',
+                  value: 'Some value here',
+                  inline: true,
+                },
+                {
+                  name: 'Inline field title',
+                  value: 'Some value here',
+                  inline: true,
+                }
+              )
+              .addFields({
+                name: 'Inline field title',
+                value: 'Some value here',
+                inline: true,
+              })
+              .setImage('https://i.imgur.com/AfFp7pu.png')
+              .setTimestamp()
+              .setFooter({
+                text: 'Some footer text here',
+                iconURL: 'https://i.imgur.com/AfFp7pu.png',
+              });
+            await interaction.message.delete();
+            await interaction.channel.send({ embeds: [exampleEmbed] });
+            break;
+          case 'weeklyButton':
+            await interaction.message.delete();
+            await interaction.channel.send({
+              content: 'Need to implement this logic',
             });
             break;
           default:
@@ -722,19 +780,8 @@ module.exports = () => {
             // });
             break;
         }
-      case 'fussyButton':
-        saveLog({
-          fusses: { [time]: { type: 'madge' } },
-        });
-        await interaction.message.delete();
-        await interaction.reply({
-          content: `😫 Fussiness logged at ${buildTimestamp(time)}`,
-        });
-        break;
-
-        break;
       case 'ApplicationCommandAutocomplete':
-        console.log('Command autocomplete event received');
+        // console.log('Command autocomplete event received');
         break;
       case 'ModalSubmit':
         console.log('Modal submit even received');

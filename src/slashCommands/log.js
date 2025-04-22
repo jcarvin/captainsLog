@@ -79,25 +79,6 @@ module.exports = {
           withResponse: true,
         });
       }
-      const confirm = new ButtonBuilder()
-        .setCustomId('feeding')
-        .setLabel('Feeding')
-        .setEmoji('🍼')
-        .setStyle(ButtonStyle.Success);
-
-      const cancel = new ButtonBuilder()
-        .setCustomId('diaperChange')
-        .setLabel('Diaper change')
-        .setEmoji('🧻')
-        .setStyle(ButtonStyle.Success);
-
-      const row = new ActionRowBuilder().addComponents(cancel, confirm);
-
-      await interaction.reply({
-        content: 'What event would you like to log?',
-        components: [row],
-        withResponse: true,
-      });
     } catch (e) {
       console.log(`There was an error with the undefined command: ${e}`);
     }

@@ -12,6 +12,7 @@ const messageListeners = require('../events');
 const {
   saveLog,
   getMostRecentFeeding,
+  getMostRecentSleep,
   getAverageFeedingTimeBySide,
 } = require('../utilities/logger');
 
@@ -723,6 +724,66 @@ module.exports = () => {
             await interaction.message.delete();
             await interaction.channel.send({
               content: `😫 Fussiness logged at ${buildTimestamp(time)}`,
+            });
+            break;
+          case 'sleepButton':
+            const fellAsleepButton = new ButtonBuilder()
+              .setCustomId('fellAsleepButton')
+              .setLabel('Fell asleep')
+              .setEmoji('😴')
+              .setStyle(ButtonStyle.Primary);
+
+            const wokeUpButton = new ButtonBuilder()
+              .setCustomId('wokeUpButton')
+              .setLabel('Woke up')
+              .setEmoji('🥱')
+              .setStyle(ButtonStyle.Success);
+
+            const sleepButtons = new ActionRowBuilder().addComponents(
+              fellAsleepButton,
+              wokeUpButton
+            );
+            await interaction.message.delete();
+            await interaction.channel.send({
+              // content: 'What side did she feed from',
+              components: [sleepButtons],
+              withResponse: true,
+            });
+            break;
+          case 'fellAsleepButton':
+            saveLog({
+              sleeps: { [time]: { startTime: time } },
+            });
+            await interaction.message.delete();
+            await interaction.channel.send({
+              content: `😴 Sleep logged at ${buildTimestamp(time)}`,
+            });
+            break;
+          case 'wokeUpButton':
+            const mostRecentSleep = getMostRecentSleep();
+            if (!!mostRecentSleep.endTime) {
+              saveLog({
+                sleeps: { [time]: { endTime: time } },
+              });
+            } else {
+              saveLog({
+                sleeps: {
+                  [mostRecentSleep.startTime]: {
+                    ...mostRecentSleep,
+                    endTime: time,
+                  },
+                },
+              });
+            }
+            await interaction.message.delete();
+            await interaction.channel.send({
+              content: `🥱 Wake time logged at ${buildTimestamp(time)} ${
+                (!mostRecentSleep.endTime &&
+                  `Slept for ${Math.floor(
+                    (time - mostRecentSleep.startTime) / (1000 * 60)
+                  )} minutes`) ||
+                ''
+              }`,
             });
             break;
           // stats logic

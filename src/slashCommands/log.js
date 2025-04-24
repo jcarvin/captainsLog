@@ -28,6 +28,12 @@ module.exports = {
           .setEmoji('🧻')
           .setStyle(ButtonStyle.Success);
 
+        const sleepButton = new ButtonBuilder()
+          .setCustomId('sleepButton')
+          .setLabel('Sleep')
+          .setEmoji('💤')
+          .setStyle(ButtonStyle.Primary);
+
         const fussyButton = new ButtonBuilder()
           .setCustomId('fussyButton')
           .setLabel('Fussy')
@@ -37,6 +43,7 @@ module.exports = {
         const row = new ActionRowBuilder().addComponents(
           diaperButton,
           feedingButton,
+          sleepButton,
           fussyButton
         );
 

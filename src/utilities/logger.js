@@ -13,7 +13,7 @@ function loadLogs() {
   if (!fs.existsSync(dataPath)) {
     fs.writeFileSync(
       dataPath,
-      '{"diaperChanges": {}, "feedings": {}, "fusses": {}}'
+      '{"diaperChanges": {}, "feedings": {}, "fusses": {}, "sleeps": {}}'
     );
   }
 
@@ -25,6 +25,12 @@ function getMostRecentFeeding() {
   const { feedings } = loadLogs();
   const mostRecentTimestamp = Math.max(...Object.keys(feedings));
   return feedings[mostRecentTimestamp];
+}
+
+function getMostRecentSleep() {
+  const { sleeps } = loadLogs();
+  const mostRecentTimestamp = Math.max(...Object.keys(sleeps));
+  return sleeps[mostRecentTimestamp];
 }
 
 function getAverageFeedingTimeBySide(side) {
@@ -45,16 +51,13 @@ function getAverageFeedingTimeBySide(side) {
   return Math.floor(averageDurationMs / (1000 * 60)); // return in minutes
 }
 
-function timeSinceLastFeeding() {
-  const feeding = getMostRecentFeeding();
-}
-
 function saveLog(entry) {
-  const { diaperChanges, feedings, fusses } = loadLogs();
+  const { diaperChanges, feedings, fusses, sleeps } = loadLogs();
   const newLogs = {
     diaperChanges: { ...diaperChanges, ...entry.diaperChanges },
     feedings: { ...feedings, ...entry.feedings },
     fusses: { ...(fusses || {}), ...entry.fusses },
+    sleeps: { ...(sleeps || {}), ...entry.sleeps },
   };
   fs.writeFileSync(dataPath, JSON.stringify(newLogs, null, 2));
 }
@@ -63,6 +66,6 @@ module.exports = {
   loadLogs,
   saveLog,
   getMostRecentFeeding,
+  getMostRecentSleep,
   getAverageFeedingTimeBySide,
-  timeSinceLastFeeding,
 };

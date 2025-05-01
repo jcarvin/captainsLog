@@ -13,7 +13,10 @@ const {
   saveLog,
   getMostRecentFeeding,
   getMostRecentSleep,
+  getMostRecentMidnight,
   getAverageFeedingTimeBySide,
+  buildTimeDiff,
+  getTodaysStats,
 } = require('../utilities/logger');
 
 function buildTimestamp(time) {
@@ -787,47 +790,83 @@ module.exports = () => {
             });
             break;
           // stats logic
-          case 'dailyButton': // inside a command, event listener, etc.
+          case 'todayButton': // inside a command, event listener, etc.
+            const {
+              totalFeeds,
+              averageTimeBetweenFeeds,
+              averageFeedingDuration,
+              averageFeedingDurationLeft,
+              averageFeedingDurationRight,
+              totalDiaperChanges,
+              totalPees,
+              totalPoops,
+              averageTimeBetweenDiaperChanges,
+            } = getTodaysStats();
             const exampleEmbed = new EmbedBuilder()
               .setColor(0x0099ff)
-              .setTitle('Some title')
-              .setURL('https://discord.js.org/')
+              .setTitle('Todays averages')
               .setAuthor({
-                name: 'Some name',
-                iconURL: 'https://i.imgur.com/AfFp7pu.png',
-                url: 'https://discord.js.org',
+                name: 'Captain Wren',
               })
-              .setDescription('Some description here')
-              .setThumbnail('https://i.imgur.com/AfFp7pu.png')
+              .setDescription(
+                `Averages since 12am this morning (${buildTimeDiff(
+                  getMostRecentMidnight(),
+                  time
+                )} ago):`
+              )
               .addFields(
-                { name: 'Regular field title', value: 'Some value here' },
                 { name: '\u200B', value: '\u200B' },
+                { name: 'Feeding stats:', value: '' },
                 {
-                  name: 'Inline field title',
-                  value: 'Some value here',
+                  name: 'Total feeds since 12am',
+                  value: `${totalFeeds}`,
+                },
+                {
+                  name: 'Average time between feeds',
+                  value: `${averageTimeBetweenFeeds}`,
+                },
+                {
+                  name: 'Average feeding duration overall',
+                  value: `${averageFeedingDuration}`,
+                },
+                {
+                  name: 'Average feeding duration left',
+                  value: `${averageFeedingDurationLeft}`,
                   inline: true,
                 },
                 {
-                  name: 'Inline field title',
-                  value: 'Some value here',
+                  name: 'Average feeding duration right',
+                  value: `${averageFeedingDurationRight}`,
                   inline: true,
+                },
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Diaper stats:', value: '' },
+                {
+                  name: 'Total diaper changes since 12am',
+                  value: `${totalDiaperChanges}`,
+                },
+                {
+                  name: 'Total pees',
+                  value: `${totalPees}`,
+                },
+                {
+                  name: 'Total poops',
+                  value: `${totalPoops}`,
+                },
+                {
+                  name: 'Average time between changes',
+                  value: `${averageTimeBetweenDiaperChanges}`,
                 }
               )
-              .addFields({
-                name: 'Inline field title',
-                value: 'Some value here',
-                inline: true,
-              })
-              .setImage('https://i.imgur.com/AfFp7pu.png')
-              .setTimestamp()
-              .setFooter({
-                text: 'Some footer text here',
-                iconURL: 'https://i.imgur.com/AfFp7pu.png',
-              });
+              .setTimestamp();
+            // .setFooter({
+            //   text: 'Some footer text here',
+            //   iconURL: 'https://i.imgur.com/AfFp7pu.png',
+            // });
             await interaction.message.delete();
             await interaction.channel.send({ embeds: [exampleEmbed] });
             break;
-          case 'weeklyButton':
+          case 'lastSevenDaysButton':
             await interaction.message.delete();
             await interaction.channel.send({
               content: 'Need to implement this logic',

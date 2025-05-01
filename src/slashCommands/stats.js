@@ -11,19 +11,19 @@ module.exports = {
   async execute(interaction) {
     try {
       const dailyButton = new ButtonBuilder()
-        .setCustomId('dailyButton')
-        .setLabel('Daily')
+        .setCustomId('todayButton')
+        .setLabel('Today')
         .setEmoji('⌚')
         .setStyle(ButtonStyle.Primary);
 
       const weeklyButton = new ButtonBuilder()
-        .setCustomId('weeklyButton')
-        .setLabel('Weekly')
+        .setCustomId('lastSevenDaysButton')
+        .setLabel('Last seven days')
         .setEmoji('📆')
         .setStyle(ButtonStyle.Primary);
 
       const row = new ActionRowBuilder().addComponents(
-        weeklyButton,
+        // weeklyButton,
         dailyButton
       );
 

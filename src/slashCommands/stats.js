@@ -5,26 +5,33 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('stats')
+    .setName('teststats')
     .setDescription('Shows stats about baby feedings and diaper changes'),
 
   async execute(interaction) {
     try {
-      const dailyButton = new ButtonBuilder()
+      const yesterdayButton = new ButtonBuilder()
+        .setCustomId('yesterdayButton')
+        .setLabel('yesterday')
+        .setEmoji('⬅️')
+        .setStyle(ButtonStyle.Primary);
+
+      const todayButton = new ButtonBuilder()
         .setCustomId('todayButton')
         .setLabel('Today')
         .setEmoji('⌚')
         .setStyle(ButtonStyle.Primary);
 
-      const weeklyButton = new ButtonBuilder()
+      const lastSevenDaysButton = new ButtonBuilder()
         .setCustomId('lastSevenDaysButton')
         .setLabel('Last seven days')
         .setEmoji('📆')
         .setStyle(ButtonStyle.Primary);
 
       const row = new ActionRowBuilder().addComponents(
-        // weeklyButton,
-        dailyButton
+        yesterdayButton,
+        todayButton,
+        // lastSevenDaysButton
       );
 
       await interaction.reply({

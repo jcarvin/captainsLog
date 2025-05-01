@@ -804,7 +804,7 @@ module.exports = () => {
             } = getDailyStats();
             const todayEmbed = new EmbedBuilder()
               .setColor(0x0099ff)
-              .setTitle('Todays averages')
+              .setTitle('Todays stats')
               .setAuthor({
                 name: 'Captain Wren',
               })
@@ -880,9 +880,9 @@ module.exports = () => {
               averageTimeBetweenDiaperChanges:
                 yesterday_averageTimeBetweenDiaperChanges,
             } = getDailyStats(true);
-            const exampleEmbed = new EmbedBuilder()
+            const yesterdayEmbed = new EmbedBuilder()
               .setColor(0x0099ff)
-              .setTitle('Todays averages')
+              .setTitle('Yesterdays stats')
               .setAuthor({
                 name: 'Captain Wren',
               })
@@ -891,7 +891,7 @@ module.exports = () => {
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Feeding stats:', value: '' },
                 {
-                  name: 'Total feeds since 12am',
+                  name: 'Total feeds yesterday',
                   value: `${yesterday_totalFeeds}`,
                 },
                 {
@@ -915,7 +915,7 @@ module.exports = () => {
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
                 {
-                  name: 'Total diaper changes since 12am',
+                  name: 'Total diaper changes yesterday',
                   value: `${yesterday_totalDiaperChanges}`,
                 },
                 {
@@ -937,7 +937,7 @@ module.exports = () => {
             //   iconURL: 'https://i.imgur.com/AfFp7pu.png',
             // });
             await interaction.message.delete();
-            await interaction.channel.send({ embeds: [exampleEmbed] });
+            await interaction.channel.send({ embeds: [yesterdayEmbed] });
             break;
           case 'lastSevenDaysButton':
             await interaction.message.delete();

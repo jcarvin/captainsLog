@@ -130,7 +130,7 @@ function getMostRecentMidnight() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-function getTodaysStats() {
+function getDailyStats(yesterday = false) {
   const { feedings, diaperChanges } = loadLogs();
   const todaysFeedings = Object.values(feedings).filter(
     (feeding) => feeding.startTime >= getMostRecentMidnight()
@@ -226,5 +226,5 @@ module.exports = {
   getAverageFeedingTimeBySide,
   getMostRecentMidnight,
   buildTimeDiff,
-  getTodaysStats,
+  getDailyStats,
 };

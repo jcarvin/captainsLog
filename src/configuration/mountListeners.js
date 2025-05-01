@@ -16,7 +16,7 @@ const {
   getMostRecentMidnight,
   getAverageFeedingTimeBySide,
   buildTimeDiff,
-  getTodaysStats,
+  getDailyStats,
 } = require('../utilities/logger');
 
 function buildTimestamp(time) {
@@ -801,7 +801,7 @@ module.exports = () => {
               totalPees,
               totalPoops,
               averageTimeBetweenDiaperChanges,
-            } = getTodaysStats();
+            } = getDailyStats();
             const exampleEmbed = new EmbedBuilder()
               .setColor(0x0099ff)
               .setTitle('Todays averages')

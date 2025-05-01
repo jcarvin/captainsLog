@@ -17,6 +17,7 @@ const {
   getAverageFeedingTimeBySide,
   buildTimeDiff,
   getDailyStats,
+  getTimePeriodStats,
 } = require('../utilities/logger');
 
 function buildTimestamp(time) {
@@ -940,17 +941,90 @@ module.exports = () => {
             await interaction.channel.send({ embeds: [yesterdayEmbed] });
             break;
           case 'lastSevenDaysButton':
-            await interaction.message.delete();
-            await interaction.channel.send({
-              content: 'Need to implement this logic',
-            });
-            break;
-          default:
-            console.log('Unknown id');
-            // await interaction.message.delete();
-            // await interaction.reply({
-            //   content: 'Unable to update the log 😞',
+            const {
+              startDay,
+              endDay,
+              totalFeeds: lastSevenDays_totalFeeds,
+              averageFeedsPerDay,
+              averageTimeBetweenFeeds: lastSevenDays_averageTimeBetweenFeeds,
+              averageFeedingDuration: lastSevenDays_averageFeedingDuration,
+              averageFeedingDurationLeft:
+                lastSevenDays_averageFeedingDurationLeft,
+              averageFeedingDurationRight:
+                lastSevenDays_averageFeedingDurationRight,
+              totalDiaperChanges: lastSevenDays_totalDiaperChanges,
+              averageDiaperChangePerDay,
+              totalPees: lastSevenDays_totalPees,
+              totalPoops: lastSevenDays_totalPoops,
+              averageTimeBetweenDiaperChanges:
+                lastSevenDays_averageTimeBetweenDiaperChanges,
+            } = getTimePeriodStats();
+            const sevenDaysEmbed = new EmbedBuilder()
+              .setColor(0x0099ff)
+              .setTitle('Last 7 days stats')
+              .setAuthor({
+                name: 'Captain Wren',
+              })
+              .setDescription(`Stats from 12am ${startDay} to 12am ${endDay}`)
+              .addFields(
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Feeding stats:', value: '' },
+                {
+                  name: 'Total feeds over the last 7 days',
+                  value: `${lastSevenDays_totalFeeds}`,
+                },
+                {
+                  name: 'Average feeds per day',
+                  value: `${averageFeedsPerDay}`,
+                },
+                {
+                  name: 'Average time between feeds',
+                  value: `${lastSevenDays_averageTimeBetweenFeeds}`,
+                },
+                {
+                  name: 'Average feeding duration overall',
+                  value: `${lastSevenDays_averageFeedingDuration}`,
+                },
+                {
+                  name: 'Average feeding duration left',
+                  value: `${lastSevenDays_averageFeedingDurationLeft}`,
+                  inline: true,
+                },
+                {
+                  name: 'Average feeding duration right',
+                  value: `${lastSevenDays_averageFeedingDurationRight}`,
+                  inline: true,
+                },
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Diaper stats:', value: '' },
+                {
+                  name: 'Total diaper changes over the last 7 days',
+                  value: `${lastSevenDays_totalDiaperChanges}`,
+                },
+                {
+                  name: 'Average diaper changes per day',
+                  value: `${averageDiaperChangePerDay}`,
+                },
+                {
+                  name: 'Total pees',
+                  value: `${lastSevenDays_totalPees}`,
+                },
+                {
+                  name: 'Total poops',
+                  value: `${lastSevenDays_totalPoops}`,
+                },
+                {
+                  name: 'Average time between changes',
+                  value: `${lastSevenDays_averageTimeBetweenDiaperChanges}`,
+                }
+              )
+              .setTimestamp();
+            // .setFooter({
+            //   text: 'Some footer text here',
+            //   iconURL: 'https://i.imgur.com/AfFp7pu.png',
             // });
+            await interaction.message.delete();
+            await interaction.channel.send({ embeds: [sevenDaysEmbed] });
             break;
         }
       case 'ApplicationCommandAutocomplete':

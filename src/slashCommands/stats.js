@@ -30,8 +30,8 @@ module.exports = {
 
       const row = new ActionRowBuilder().addComponents(
         yesterdayButton,
-        todayButton
-        // lastSevenDaysButton
+        todayButton,
+        lastSevenDaysButton
       );
 
       await interaction.reply({

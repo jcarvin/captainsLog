@@ -184,7 +184,7 @@ function getDailyStats(yesterday = false) {
           .slice(1)
           .reduce((sum, ts, i) => sum + (ts - sortedDiaperChanges[i]), 0);
   const averageTimeBetweenDiaperChanges = buildDuration(
-    totalDiaperChangeInterval / totalDiaperChanges - 1
+    totalDiaperChangeInterval / totalDiaperChanges
   );
 
   return {
@@ -196,6 +196,81 @@ function getDailyStats(yesterday = false) {
     totalDiaperChanges,
     totalPees,
     totalPoops,
+    averageTimeBetweenDiaperChanges,
+  };
+}
+function getTimePeriodStats(numDays = 7) {
+  const mostRecentMidnight = getMostRecentMidnight();
+  const now = new Date();
+  const midnightXDaysAgo = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - numDays
+  );
+
+  const startDay = `${midnightXDaysAgo.getMonth()}/${midnightXDaysAgo.getDate()}/${midnightXDaysAgo.getFullYear()}`;
+  const endDay = `${mostRecentMidnight.getMonth()}/${mostRecentMidnight.getDate()}/${mostRecentMidnight.getFullYear()}`;
+  const { feedings, diaperChanges } = loadLogs();
+  const relevantFeedings = Object.values(feedings).filter(
+    (feeding) =>
+      feeding.startTime >= midnightXDaysAgo &&
+      feeding.startTime <= mostRecentMidnight
+  );
+  // const relevantFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
+  const relevantDiaperChanges = Object.keys(diaperChanges).filter(
+    (changeTime) =>
+      changeTime >= midnightXDaysAgo && changeTime <= mostRecentMidnight
+  );
+  // const relevantDiaperChanges = Object.keys(diaperChanges).filter(
+  //   (changeTime) => true
+  // );
+  const totalFeeds = relevantFeedings.length;
+  const averageFeedsPerDay = totalFeeds / numDays;
+  const averageTimeBetweenFeeds =
+    getAverageIntervalBetweenFeedings(relevantFeedings);
+  const { averageDuration: averageFeedingDuration } =
+    getAverageFeedingDuration(relevantFeedings);
+  const { averageDuration: averageFeedingDurationLeft } =
+    getAverageFeedingDuration(relevantFeedings, 'left');
+  const { averageDuration: averageFeedingDurationRight } =
+    getAverageFeedingDuration(relevantFeedings, 'right');
+
+  const totalDiaperChanges = relevantDiaperChanges.length;
+  const totalPees = relevantDiaperChanges.filter(
+    (timestamp) =>
+      diaperChanges[timestamp].type === 'pee' ||
+      diaperChanges[timestamp].type === 'both'
+  ).length;
+  const totalPoops = relevantDiaperChanges.filter(
+    (timestamp) =>
+      diaperChanges[timestamp].type === 'poop' ||
+      diaperChanges[timestamp].type === 'both'
+  ).length;
+  const sortedDiaperChanges = [...relevantDiaperChanges].sort((a, b) => a - b);
+  const totalDiaperChangeInterval =
+    relevantDiaperChanges.length < 2
+      ? 0
+      : sortedDiaperChanges
+          .slice(1)
+          .reduce((sum, ts, i) => sum + (ts - sortedDiaperChanges[i]), 0);
+  const averageDiaperChangePerDay = totalDiaperChanges / numDays;
+  const averageTimeBetweenDiaperChanges = buildDuration(
+    totalDiaperChangeInterval / totalDiaperChanges
+  );
+
+  return {
+    startDay,
+    endDay,
+    totalFeeds,
+    averageFeedsPerDay,
+    averageTimeBetweenFeeds,
+    averageFeedingDuration,
+    averageFeedingDurationLeft,
+    averageFeedingDurationRight,
+    totalDiaperChanges,
+    totalPees,
+    totalPoops,
+    averageDiaperChangePerDay,
     averageTimeBetweenDiaperChanges,
   };
 }
@@ -238,4 +313,5 @@ module.exports = {
   getMostRecentMidnight,
   buildTimeDiff,
   getDailyStats,
+  getTimePeriodStats,
 };

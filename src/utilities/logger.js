@@ -132,16 +132,16 @@ function getMostRecentMidnight() {
 
 function getTodaysStats() {
   const { feedings, diaperChanges } = loadLogs();
-  // const todaysFeedings = Object.values(feedings).filter(
-  //   (feeding) => feeding.startTime >= getMostRecentMidnight()
-  // );
-  const todaysFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
-  // const todaysDiaperChangeTimes = Object.keys(diaperChanges).filter(
-  //   (changeTime) => changeTime >= getMostRecentMidnight()
-  // );
-  const todaysDiaperChangeTimes = Object.keys(diaperChanges).filter(
-    (changeTime) => true
+  const todaysFeedings = Object.values(feedings).filter(
+    (feeding) => feeding.startTime >= getMostRecentMidnight()
   );
+  // const todaysFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
+  const todaysDiaperChangeTimes = Object.keys(diaperChanges).filter(
+    (changeTime) => changeTime >= getMostRecentMidnight()
+  );
+  // const todaysDiaperChangeTimes = Object.keys(diaperChanges).filter(
+  //   (changeTime) => true
+  // );
   const totalFeeds = todaysFeedings.length;
   const averageTimeBetweenFeeds =
     getAverageIntervalBetweenFeedings(todaysFeedings);

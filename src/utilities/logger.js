@@ -131,43 +131,54 @@ function getMostRecentMidnight() {
 }
 
 function getDailyStats(yesterday = false) {
+  const now = new Date();
+  const yesterdaysMidnight = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - 1
+  );
+  const mostRecentMidnight = getMostRecentMidnight();
   const { feedings, diaperChanges } = loadLogs();
-  const todaysFeedings = Object.values(feedings).filter(
-    (feeding) => feeding.startTime >= getMostRecentMidnight()
+  const relevantFeedings = Object.values(feedings).filter((feeding) =>
+    yesterday
+      ? feeding.startTime >= yesterdaysMidnight &&
+        feeding.startTime <= mostRecentMidnight
+      : feeding.startTime >= mostRecentMidnight
   );
-  // const todaysFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
-  const todaysDiaperChangeTimes = Object.keys(diaperChanges).filter(
-    (changeTime) => changeTime >= getMostRecentMidnight()
+  // const relevantFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
+  const relevantDiaperChanges = Object.keys(diaperChanges).filter(
+    (changeTime) =>
+      yesterday
+        ? changeTime >= yesterdaysMidnight && changeTime <= mostRecentMidnight
+        : changeTime >= mostRecentMidnight
   );
-  // const todaysDiaperChangeTimes = Object.keys(diaperChanges).filter(
+  // const relevantDiaperChanges = Object.keys(diaperChanges).filter(
   //   (changeTime) => true
   // );
-  const totalFeeds = todaysFeedings.length;
+  const totalFeeds = relevantFeedings.length;
   const averageTimeBetweenFeeds =
-    getAverageIntervalBetweenFeedings(todaysFeedings);
+    getAverageIntervalBetweenFeedings(relevantFeedings);
   const { averageDuration: averageFeedingDuration } =
-    getAverageFeedingDuration(todaysFeedings);
+    getAverageFeedingDuration(relevantFeedings);
   const { averageDuration: averageFeedingDurationLeft } =
-    getAverageFeedingDuration(todaysFeedings, 'left');
+    getAverageFeedingDuration(relevantFeedings, 'left');
   const { averageDuration: averageFeedingDurationRight } =
-    getAverageFeedingDuration(todaysFeedings, 'right');
+    getAverageFeedingDuration(relevantFeedings, 'right');
 
-  const totalDiaperChanges = todaysDiaperChangeTimes.length;
-  const totalPees = todaysDiaperChangeTimes.filter(
+  const totalDiaperChanges = relevantDiaperChanges.length;
+  const totalPees = relevantDiaperChanges.filter(
     (timestamp) =>
       diaperChanges[timestamp].type === 'pee' ||
       diaperChanges[timestamp].type === 'both'
   ).length;
-  const totalPoops = todaysDiaperChangeTimes.filter(
+  const totalPoops = relevantDiaperChanges.filter(
     (timestamp) =>
       diaperChanges[timestamp].type === 'poop' ||
       diaperChanges[timestamp].type === 'both'
   ).length;
-  const sortedDiaperChanges = [...todaysDiaperChangeTimes].sort(
-    (a, b) => a - b
-  );
+  const sortedDiaperChanges = [...relevantDiaperChanges].sort((a, b) => a - b);
   const totalDiaperChangeInterval =
-    todaysDiaperChangeTimes.length < 2
+    relevantDiaperChanges.length < 2
       ? 0
       : sortedDiaperChanges
           .slice(1)

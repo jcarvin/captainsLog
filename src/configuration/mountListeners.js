@@ -802,7 +802,7 @@ module.exports = () => {
               totalPoops,
               averageTimeBetweenDiaperChanges,
             } = getDailyStats();
-            const exampleEmbed = new EmbedBuilder()
+            const todayEmbed = new EmbedBuilder()
               .setColor(0x0099ff)
               .setTitle('Todays averages')
               .setAuthor({
@@ -856,6 +856,79 @@ module.exports = () => {
                 {
                   name: 'Average time between changes',
                   value: `${averageTimeBetweenDiaperChanges}`,
+                }
+              )
+              .setTimestamp();
+            // .setFooter({
+            //   text: 'Some footer text here',
+            //   iconURL: 'https://i.imgur.com/AfFp7pu.png',
+            // });
+            await interaction.message.delete();
+            await interaction.channel.send({ embeds: [todayEmbed] });
+            break;
+          case 'yesterdayButton': // inside a command, event listener, etc.
+            const {
+              totalFeeds: yesterday_totalFeeds,
+              averageTimeBetweenFeeds: yesterday_averageTimeBetweenFeeds,
+              averageFeedingDuration: yesterday_averageFeedingDuration,
+              averageFeedingDurationLeft: yesterday_averageFeedingDurationLeft,
+              averageFeedingDurationRight:
+                yesterday_averageFeedingDurationRight,
+              totalDiaperChanges: yesterday_totalDiaperChanges,
+              totalPees: yesterday_totalPees,
+              totalPoops: yesterday_totalPoops,
+              averageTimeBetweenDiaperChanges:
+                yesterday_averageTimeBetweenDiaperChanges,
+            } = getDailyStats(true);
+            const exampleEmbed = new EmbedBuilder()
+              .setColor(0x0099ff)
+              .setTitle('Todays averages')
+              .setAuthor({
+                name: 'Captain Wren',
+              })
+              .setDescription(`Yesterdays averages:`)
+              .addFields(
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Feeding stats:', value: '' },
+                {
+                  name: 'Total feeds since 12am',
+                  value: `${yesterday_totalFeeds}`,
+                },
+                {
+                  name: 'Average time between feeds',
+                  value: `${yesterday_averageTimeBetweenFeeds}`,
+                },
+                {
+                  name: 'Average feeding duration overall',
+                  value: `${yesterday_averageFeedingDuration}`,
+                },
+                {
+                  name: 'Average feeding duration left',
+                  value: `${yesterday_averageFeedingDurationLeft}`,
+                  inline: true,
+                },
+                {
+                  name: 'Average feeding duration right',
+                  value: `${yesterday_averageFeedingDurationRight}`,
+                  inline: true,
+                },
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Diaper stats:', value: '' },
+                {
+                  name: 'Total diaper changes since 12am',
+                  value: `${yesterday_totalDiaperChanges}`,
+                },
+                {
+                  name: 'Total pees',
+                  value: `${yesterday_totalPees}`,
+                },
+                {
+                  name: 'Total poops',
+                  value: `${yesterday_totalPoops}`,
+                },
+                {
+                  name: 'Average time between changes',
+                  value: `${yesterday_averageTimeBetweenDiaperChanges}`,
                 }
               )
               .setTimestamp();

@@ -5,7 +5,7 @@ const { ActionRowBuilder, ButtonBuilder, ButtonStyle } = require('discord.js');
 
 module.exports = {
   data: new SlashCommandBuilder()
-    .setName('teststats')
+    .setName('stats')
     .setDescription('Shows stats about baby feedings and diaper changes'),
 
   async execute(interaction) {
@@ -30,7 +30,7 @@ module.exports = {
 
       const row = new ActionRowBuilder().addComponents(
         yesterdayButton,
-        todayButton,
+        todayButton
         // lastSevenDaysButton
       );
 

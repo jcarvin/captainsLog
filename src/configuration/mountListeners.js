@@ -804,7 +804,7 @@ module.exports = () => {
               averageTimeBetweenDiaperChanges,
             } = getDailyStats();
             const todayEmbed = new EmbedBuilder()
-              .setColor(0x0099ff)
+              .setColor(0xe980bf)
               .setTitle('Todays stats')
               .setAuthor({
                 name: 'Captain Wren',
@@ -882,7 +882,7 @@ module.exports = () => {
                 yesterday_averageTimeBetweenDiaperChanges,
             } = getDailyStats(true);
             const yesterdayEmbed = new EmbedBuilder()
-              .setColor(0x0099ff)
+              .setColor(0xe980bf)
               .setTitle('Yesterdays stats')
               .setAuthor({
                 name: 'Captain Wren',
@@ -960,7 +960,7 @@ module.exports = () => {
                 lastSevenDays_averageTimeBetweenDiaperChanges,
             } = getTimePeriodStats();
             const sevenDaysEmbed = new EmbedBuilder()
-              .setColor(0x0099ff)
+              .setColor(0xe980bf)
               .setTitle('Last 7 days stats')
               .setAuthor({
                 name: 'Captain Wren',

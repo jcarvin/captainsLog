@@ -20,6 +20,9 @@ function loadLogs() {
   const file = fs.readFileSync(dataPath);
   return JSON.parse(file);
 }
+function roundToNearestTenth(number) {
+  return Math.round(number * 10) / 10;
+}
 
 function buildTimestamp(time) {
   const date = new Date(time);
@@ -315,7 +318,7 @@ function getTimePeriodStats(numDays = 7) {
       changeTime >= midnightXDaysAgo && changeTime <= mostRecentMidnight
   );
   const totalFeeds = groupedFeedings.length;
-  const averageFeedsPerDay = totalFeeds / numDays;
+  const averageFeedsPerDay = roundToNearestTenth(totalFeeds / numDays);
   const averageTimeBetweenFeeds =
     getAverageIntervalBetweenFeedings(groupedFeedings);
   const { averageDuration: averageFeedingDuration } =
@@ -337,8 +340,8 @@ function getTimePeriodStats(numDays = 7) {
       diaperChanges[timestamp].type === 'poop' ||
       diaperChanges[timestamp].type === 'both'
   ).length;
-  const averagePoopsPerDay = totalPoops / numDays;
-  const averagePeesPerDay = totalPees / numDays;
+  const averagePoopsPerDay = roundToNearestTenth(totalPoops / numDays);
+  const averagePeesPerDay = roundToNearestTenth(totalPees / numDays);
   const sortedDiaperChanges = [...relevantDiaperChanges].sort((a, b) => a - b);
   const totalDiaperChangeInterval =
     relevantDiaperChanges.length < 2
@@ -346,7 +349,9 @@ function getTimePeriodStats(numDays = 7) {
       : sortedDiaperChanges
           .slice(1)
           .reduce((sum, ts, i) => sum + (ts - sortedDiaperChanges[i]), 0);
-  const averageDiaperChangePerDay = totalDiaperChanges / numDays;
+  const averageDiaperChangePerDay = roundToNearestTenth(
+    totalDiaperChanges / numDays
+  );
   const averageTimeBetweenDiaperChanges = buildDuration(
     totalDiaperChangeInterval / totalDiaperChanges
   );
@@ -411,4 +416,5 @@ module.exports = {
   buildTimeDiff,
   getDailyStats,
   getTimePeriodStats,
+  roundToNearestTenth,
 };

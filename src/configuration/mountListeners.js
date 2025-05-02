@@ -19,6 +19,7 @@ const {
   buildTimeDiff,
   getDailyStats,
   getTimePeriodStats,
+  roundToNearestTenth,
 } = require('../utilities/logger');
 
 function buildFeedEmoji(type, side) {
@@ -460,7 +461,9 @@ module.exports = () => {
             break;
           case 'resumeButton':
             const pauseDuration = time - feeding.pauseTime;
-            const pauseDurationInMinutes = pauseDuration / (1000 * 60);
+            const pauseDurationInMinutes = roundToNearestTenth(
+              pauseDuration / (1000 * 60)
+            );
             saveLog({
               feedings: {
                 [feeding.startTime]: {

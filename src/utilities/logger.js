@@ -130,6 +130,37 @@ function getMostRecentMidnight() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
+function groupFeedings(feedingsArray) {
+  return feedingsArray.reduce((acc, currVal, i) => {
+    if (i === 0) {
+      return [currVal];
+    }
+    // if time since most recent feeding is less than 15 mins,
+    // replace the previous end time with this end time
+    // and add the delta to the deductions
+
+    const fifteenMins = 15 * 60 * 1000;
+    const lastVal = acc[acc.length - 1];
+
+    if (currVal.startTime - lastVal.endTime <= fifteenMins) {
+      const newAccumulator = [...acc]; // Create a copy to avoid mutation
+      newAccumulator.pop();
+      newAccumulator.push({
+        ...lastVal,
+        endTime: currVal.endTime,
+        deductions: [
+          ...(lastVal?.deductions || []),
+          ...(currVal?.deductions || []),
+          currVal.startTime - lastVal.endTime,
+        ],
+      });
+      return newAccumulator;
+    } else {
+      return [...acc, currVal];
+    }
+  }, []);
+}
+
 function getDailyStats(yesterday = false) {
   const now = new Date();
   const yesterdaysMidnight = new Date(
@@ -145,21 +176,18 @@ function getDailyStats(yesterday = false) {
         feeding.startTime <= mostRecentMidnight
       : feeding.startTime >= mostRecentMidnight
   );
-  // const relevantFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
+  const groupedFeedings = groupFeedings(relevantFeedings);
   const relevantDiaperChanges = Object.keys(diaperChanges).filter(
     (changeTime) =>
       yesterday
         ? changeTime >= yesterdaysMidnight && changeTime <= mostRecentMidnight
         : changeTime >= mostRecentMidnight
   );
-  // const relevantDiaperChanges = Object.keys(diaperChanges).filter(
-  //   (changeTime) => true
-  // );
-  const totalFeeds = relevantFeedings.length;
+  const totalFeeds = groupedFeedings.length;
   const averageTimeBetweenFeeds =
-    getAverageIntervalBetweenFeedings(relevantFeedings);
+    getAverageIntervalBetweenFeedings(groupedFeedings);
   const { averageDuration: averageFeedingDuration } =
-    getAverageFeedingDuration(relevantFeedings);
+    getAverageFeedingDuration(groupedFeedings);
   const { averageDuration: averageFeedingDurationLeft } =
     getAverageFeedingDuration(relevantFeedings, 'left');
   const { averageDuration: averageFeedingDurationRight } =
@@ -216,20 +244,17 @@ function getTimePeriodStats(numDays = 7) {
       feeding.startTime >= midnightXDaysAgo &&
       feeding.startTime <= mostRecentMidnight
   );
-  // const relevantFeedings = Object.values(feedings).filter((feeding) => true); // this is for testing.
+  const groupedFeedings = groupFeedings(relevantFeedings);
   const relevantDiaperChanges = Object.keys(diaperChanges).filter(
     (changeTime) =>
       changeTime >= midnightXDaysAgo && changeTime <= mostRecentMidnight
   );
-  // const relevantDiaperChanges = Object.keys(diaperChanges).filter(
-  //   (changeTime) => true
-  // );
-  const totalFeeds = relevantFeedings.length;
+  const totalFeeds = groupedFeedings.length;
   const averageFeedsPerDay = totalFeeds / numDays;
   const averageTimeBetweenFeeds =
-    getAverageIntervalBetweenFeedings(relevantFeedings);
+    getAverageIntervalBetweenFeedings(groupedFeedings);
   const { averageDuration: averageFeedingDuration } =
-    getAverageFeedingDuration(relevantFeedings);
+    getAverageFeedingDuration(groupedFeedings);
   const { averageDuration: averageFeedingDurationLeft } =
     getAverageFeedingDuration(relevantFeedings, 'left');
   const { averageDuration: averageFeedingDurationRight } =

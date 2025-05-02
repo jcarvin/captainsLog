@@ -337,6 +337,8 @@ function getTimePeriodStats(numDays = 7) {
       diaperChanges[timestamp].type === 'poop' ||
       diaperChanges[timestamp].type === 'both'
   ).length;
+  const averagePoopsPerDay = totalPoops / numDays;
+  const averagePeesPerDay = totalPees / numDays;
   const sortedDiaperChanges = [...relevantDiaperChanges].sort((a, b) => a - b);
   const totalDiaperChangeInterval =
     relevantDiaperChanges.length < 2
@@ -362,6 +364,8 @@ function getTimePeriodStats(numDays = 7) {
     totalDiaperChanges,
     totalPees,
     totalPoops,
+    averagePoopsPerDay,
+    averagePeesPerDay,
     averageDiaperChangePerDay,
     averageTimeBetweenDiaperChanges,
   };

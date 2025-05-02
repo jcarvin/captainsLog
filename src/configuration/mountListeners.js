@@ -1138,6 +1138,8 @@ module.exports = () => {
               totalPoops: lastSevenDays_totalPoops,
               averageTimeBetweenDiaperChanges:
                 lastSevenDays_averageTimeBetweenDiaperChanges,
+              averagePeesPerDay,
+              averagePoopsPerDay,
             } = getTimePeriodStats();
             const lastSevenDaysClustersMessage = lastSevenDays_clusters
               .map((cluster) => {
@@ -1160,12 +1162,14 @@ module.exports = () => {
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Feeding stats:', value: '' },
                 {
-                  name: 'Total feeds over the last 7 days',
+                  name: 'Total feeds',
                   value: `${lastSevenDays_totalFeeds}`,
+                  inline: true,
                 },
                 {
                   name: 'Average feeds per day',
                   value: `${averageFeedsPerDay}`,
+                  inline: true,
                 },
                 {
                   name: 'Average time between feeds',
@@ -1204,10 +1208,26 @@ module.exports = () => {
                 {
                   name: 'Total pees',
                   value: `${lastSevenDays_totalPees}`,
+                  inline: true,
+                },
+                {
+                  name: 'Average pees per day',
+                  value: `${averagePeesPerDay}`,
+                  inline: true,
+                },
+                {
+                  name: '',
+                  value: ``,
                 },
                 {
                   name: 'Total poops',
                   value: `${lastSevenDays_totalPoops}`,
+                  inline: true,
+                },
+                {
+                  name: 'Average poops per day',
+                  value: `${averagePoopsPerDay}`,
+                  inline: true,
                 },
                 {
                   name: 'Average time between changes',

@@ -21,6 +21,69 @@ function loadLogs() {
   return JSON.parse(file);
 }
 
+function buildTimestamp(time) {
+  const date = new Date(time);
+  let hours = date.getHours() + 1; // adjust for thicks timezone
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  hours = hours % 12;
+  hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
+  return `${hours}:${minutes}${ampm}`;
+}
+
+function findClusterFeedingWindows(
+  feedingsArray,
+  gapLimitMs = 45 * 60 * 1000,
+  minClusterSize = 3
+) {
+  const validFeedings = feedingsArray
+    .filter(
+      (f) => typeof f.startTime === 'number' && typeof f.endTime === 'number'
+    )
+    .sort((a, b) => a.startTime - b.startTime);
+
+  const clusters = [];
+  let cluster = [];
+
+  for (let i = 0; i < validFeedings.length; i++) {
+    const current = validFeedings[i];
+
+    if (cluster.length === 0) {
+      cluster.push(current);
+      continue;
+    }
+
+    const prev = cluster[cluster.length - 1];
+    const timeBetween = current.startTime - prev.endTime;
+
+    if (timeBetween <= gapLimitMs) {
+      cluster.push(current);
+    } else {
+      // Check if cluster is big enough to record
+      if (cluster.length >= minClusterSize) {
+        clusters.push({
+          startTime: cluster[0].startTime,
+          endTime: cluster[cluster.length - 1].endTime,
+          feedings: [...cluster],
+        });
+      }
+      // Start new cluster
+      cluster = [current];
+    }
+  }
+
+  // Final check for last cluster
+  if (cluster.length >= minClusterSize) {
+    clusters.push({
+      startTime: cluster[0].startTime,
+      endTime: cluster[cluster.length - 1].endTime,
+      feedings: [...cluster],
+    });
+  }
+
+  return clusters;
+}
+
 function getMostRecentFeeding() {
   const { feedings } = loadLogs();
   const mostRecentTimestamp = Math.max(...Object.keys(feedings));
@@ -104,7 +167,7 @@ function getAverageFeedingDuration(feedingsArray, sideFilter = null) {
     if (typeof startTime !== 'number' || typeof endTime !== 'number') continue;
 
     // Apply side filter if valid
-    if (applyFilter && side !== sideFilter) continue;
+    if ((applyFilter && side !== sideFilter) || side === 'bottle') continue;
 
     // Calculate duration
     const baseDuration = endTime - startTime;
@@ -135,14 +198,14 @@ function groupFeedings(feedingsArray) {
     if (i === 0) {
       return [currVal];
     }
-    // if time since most recent feeding is less than 15 mins,
+    // if time since most recent feeding is less than 7 mins,
     // replace the previous end time with this end time
     // and add the delta to the deductions
 
-    const fifteenMins = 15 * 60 * 1000;
+    const sevenMinutes = 7 * 60 * 1000;
     const lastVal = acc[acc.length - 1];
 
-    if (currVal.startTime - lastVal.endTime <= fifteenMins) {
+    if (currVal.startTime - lastVal.endTime <= sevenMinutes) {
       const newAccumulator = [...acc]; // Create a copy to avoid mutation
       newAccumulator.pop();
       newAccumulator.push({
@@ -192,6 +255,7 @@ function getDailyStats(yesterday = false) {
     getAverageFeedingDuration(relevantFeedings, 'left');
   const { averageDuration: averageFeedingDurationRight } =
     getAverageFeedingDuration(relevantFeedings, 'right');
+  const clusters = findClusterFeedingWindows(groupedFeedings);
 
   const totalDiaperChanges = relevantDiaperChanges.length;
   const totalPees = relevantDiaperChanges.filter(
@@ -221,6 +285,7 @@ function getDailyStats(yesterday = false) {
     averageFeedingDuration,
     averageFeedingDurationLeft,
     averageFeedingDurationRight,
+    clusters,
     totalDiaperChanges,
     totalPees,
     totalPoops,
@@ -259,6 +324,7 @@ function getTimePeriodStats(numDays = 7) {
     getAverageFeedingDuration(relevantFeedings, 'left');
   const { averageDuration: averageFeedingDurationRight } =
     getAverageFeedingDuration(relevantFeedings, 'right');
+  const clusters = findClusterFeedingWindows(groupedFeedings);
 
   const totalDiaperChanges = relevantDiaperChanges.length;
   const totalPees = relevantDiaperChanges.filter(
@@ -292,6 +358,7 @@ function getTimePeriodStats(numDays = 7) {
     averageFeedingDuration,
     averageFeedingDurationLeft,
     averageFeedingDurationRight,
+    clusters,
     totalDiaperChanges,
     totalPees,
     totalPoops,
@@ -331,6 +398,7 @@ function saveLog(entry) {
 
 module.exports = {
   loadLogs,
+  buildTimestamp,
   saveLog,
   getMostRecentFeeding,
   getMostRecentSleep,

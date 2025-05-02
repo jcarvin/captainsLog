@@ -11,6 +11,7 @@ const {
 const messageListeners = require('../events');
 const {
   saveLog,
+  buildTimestamp,
   getMostRecentFeeding,
   getMostRecentSleep,
   getMostRecentMidnight,
@@ -19,16 +20,6 @@ const {
   getDailyStats,
   getTimePeriodStats,
 } = require('../utilities/logger');
-
-function buildTimestamp(time) {
-  const date = new Date(time);
-  let hours = date.getHours() + 1; // adjust for thicks timezone
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  const ampm = hours >= 12 ? 'PM' : 'AM';
-  hours = hours % 12;
-  hours = hours === 0 ? 12 : hours; // 0 becomes 12 in 12-hour format
-  return `${hours}:${minutes}${ampm}`;
-}
 
 function buildFeedEmoji(type, side) {
   return `${
@@ -214,6 +205,12 @@ module.exports = () => {
               .setEmoji('👉')
               .setStyle(ButtonStyle.Success);
 
+            const bottleButton = new ButtonBuilder()
+              .setCustomId('bottleButton')
+              .setLabel('Bottle')
+              .setEmoji('🍼')
+              .setStyle(ButtonStyle.Success);
+
             // const manualStartButton = new ButtonBuilder()
             //   .setCustomId('manualStartButton')
             //   .setLabel('Manual')
@@ -222,7 +219,8 @@ module.exports = () => {
 
             const feedingButtons = new ActionRowBuilder().addComponents(
               leftBoob,
-              rightBoob
+              rightBoob,
+              bottleButton
               // manualStartButton
             );
             await interaction.message.delete();
@@ -259,6 +257,159 @@ module.exports = () => {
                 'right'
               )} Feeding started on right side at ${buildTimestamp(time)}`,
             });
+            break;
+          case 'bottleButton':
+            saveLog({
+              feedings: {
+                [time]: {
+                  side: 'bottle',
+                  startTime: time,
+                },
+              },
+            });
+            const ozSelect = new StringSelectMenuBuilder()
+              .setCustomId('bottleOzs')
+              .setPlaceholder(`Roughly how many ounces did she eat?`)
+              .addOptions(
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('1oz')
+                  .setValue('1'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('2oz')
+                  .setValue('2'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('3oz')
+                  .setValue('3'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('4oz')
+                  .setValue('4'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('5oz')
+                  .setValue('5')
+              );
+            const ozRow = new ActionRowBuilder().addComponents(ozSelect);
+            await interaction.message.delete();
+            await interaction.channel.send({
+              content: 'Set feeding amount',
+              components: [ozRow],
+              withResponse: true,
+            });
+            break;
+          case 'bottleOzs':
+            switch (interaction.values[0]) {
+              case '1':
+                endTime = time;
+                amountOz = 1;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 1oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              case '2':
+                endTime = time;
+                amountOz = 2;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 2oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              case '3':
+                endTime = time;
+                amountOz = 3;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 3oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              case '4':
+                endTime = time;
+                amountOz = 4;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 4oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              case '5':
+                endTime = time;
+                amountOz = 5;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 5oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              default:
+                console.log('Unknown value');
+                // await interaction.message.delete();
+                // await interaction.reply({
+                //   content: 'Unable to update the log 😞',
+                // });
+                break;
+            }
             break;
           case 'finishButton':
             const deductions =
@@ -798,11 +949,20 @@ module.exports = () => {
               averageFeedingDuration,
               averageFeedingDurationLeft,
               averageFeedingDurationRight,
+              clusters,
               totalDiaperChanges,
               totalPees,
               totalPoops,
               averageTimeBetweenDiaperChanges,
             } = getDailyStats();
+            const clustersMessage = clusters
+              .map(
+                (cluster) =>
+                  `• ${buildTimestamp(cluster.startTime)}-${buildTimestamp(
+                    cluster.endTime
+                  )}`
+              )
+              .join('\n');
             const todayEmbed = new EmbedBuilder()
               .setColor(0xe980bf)
               .setTitle('Todays stats')
@@ -840,6 +1000,10 @@ module.exports = () => {
                   value: `${averageFeedingDurationRight}`,
                   inline: true,
                 },
+                {
+                  name: clusters.length ? 'Cluster feeding windows' : '',
+                  value: clustersMessage,
+                },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
                 {
@@ -870,6 +1034,7 @@ module.exports = () => {
           case 'yesterdayButton': // inside a command, event listener, etc.
             const {
               totalFeeds: yesterday_totalFeeds,
+              clusters: yesterday_clusters,
               averageTimeBetweenFeeds: yesterday_averageTimeBetweenFeeds,
               averageFeedingDuration: yesterday_averageFeedingDuration,
               averageFeedingDurationLeft: yesterday_averageFeedingDurationLeft,
@@ -881,6 +1046,14 @@ module.exports = () => {
               averageTimeBetweenDiaperChanges:
                 yesterday_averageTimeBetweenDiaperChanges,
             } = getDailyStats(true);
+            const yesterdayClustersMessage = yesterday_clusters
+              .map(
+                (cluster) =>
+                  `• ${buildTimestamp(cluster.startTime)}-${buildTimestamp(
+                    cluster.endTime
+                  )}`
+              )
+              .join('\n');
             const yesterdayEmbed = new EmbedBuilder()
               .setColor(0xe980bf)
               .setTitle('Yesterdays stats')
@@ -912,6 +1085,12 @@ module.exports = () => {
                   name: 'Average feeding duration right',
                   value: `${yesterday_averageFeedingDurationRight}`,
                   inline: true,
+                },
+                {
+                  name: yesterday_clusters.length
+                    ? 'Cluster feeding windows'
+                    : '',
+                  value: yesterdayClustersMessage,
                 },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
@@ -952,6 +1131,7 @@ module.exports = () => {
                 lastSevenDays_averageFeedingDurationLeft,
               averageFeedingDurationRight:
                 lastSevenDays_averageFeedingDurationRight,
+              clusters: lastSevenDays_clusters,
               totalDiaperChanges: lastSevenDays_totalDiaperChanges,
               averageDiaperChangePerDay,
               totalPees: lastSevenDays_totalPees,
@@ -959,6 +1139,16 @@ module.exports = () => {
               averageTimeBetweenDiaperChanges:
                 lastSevenDays_averageTimeBetweenDiaperChanges,
             } = getTimePeriodStats();
+            const lastSevenDaysClustersMessage = lastSevenDays_clusters
+              .map((cluster) => {
+                const clusterDate = new Date(
+                  cluster.feedings[0].startTime || null
+                );
+                return `• ${buildTimestamp(cluster.startTime)}-${buildTimestamp(
+                  cluster.endTime
+                )} ${clusterDate.getMonth()}/${clusterDate.getDate()}`;
+              })
+              .join('\n');
             const sevenDaysEmbed = new EmbedBuilder()
               .setColor(0xe980bf)
               .setTitle('Last 7 days stats')
@@ -994,6 +1184,12 @@ module.exports = () => {
                   name: 'Average feeding duration right',
                   value: `${lastSevenDays_averageFeedingDurationRight}`,
                   inline: true,
+                },
+                {
+                  name: lastSevenDaysClustersMessage.length
+                    ? 'Cluster feeding windows'
+                    : '',
+                  value: lastSevenDaysClustersMessage,
                 },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },

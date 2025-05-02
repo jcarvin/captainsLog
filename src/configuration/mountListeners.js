@@ -967,7 +967,7 @@ module.exports = () => {
               )
               .join('\n');
             const todayEmbed = new EmbedBuilder()
-              .setColor(0xe980bf)
+              .setColor(0xd16b86)
               .setTitle('Todays stats')
               .setAuthor({
                 name: 'Captain Wren',
@@ -1058,7 +1058,7 @@ module.exports = () => {
               )
               .join('\n');
             const yesterdayEmbed = new EmbedBuilder()
-              .setColor(0xe980bf)
+              .setColor(0xd772b3)
               .setTitle('Yesterdays stats')
               .setAuthor({
                 name: 'Captain Wren',
@@ -1155,7 +1155,7 @@ module.exports = () => {
               })
               .join('\n');
             const sevenDaysEmbed = new EmbedBuilder()
-              .setColor(0xe980bf)
+              .setColor(0x8866aa)
               .setTitle('Last 7 days stats')
               .setAuthor({
                 name: 'Captain Wren',

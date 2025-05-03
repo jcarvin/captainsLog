@@ -116,6 +116,43 @@ function buildDuration(timeMs) {
   return parts.join(' and ');
 }
 
+function getBabyAgeString(birthDateStr = '2025-04-11') {
+  const birthDate = new Date(birthDateStr);
+  const now = new Date();
+
+  // Calculate calendar months difference
+  let months =
+    (now.getFullYear() - birthDate.getFullYear()) * 12 +
+    (now.getMonth() - birthDate.getMonth());
+
+  // Handle incomplete current month
+  const birthDay = birthDate.getDate();
+  if (now.getDate() < birthDay) {
+    months--;
+  }
+
+  // Calculate date after subtracting full months
+  const monthAdjustedDate = new Date(birthDate);
+  monthAdjustedDate.setMonth(birthDate.getMonth() + months);
+
+  // Calculate remaining days
+  const diffMs = now - monthAdjustedDate;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+  const weeks = Math.floor(diffDays / 7);
+  const days = diffDays % 7;
+
+  // Format parts
+  const parts = [];
+  if (months > 0) parts.push(`${months} ${months === 1 ? 'month' : 'months'}`);
+  if (weeks > 0) parts.push(`${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
+  if (days > 0) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+
+  // Join parts with commas and "and"
+  if (parts.length === 0) return '0 days';
+  if (parts.length === 1) return parts[0];
+  return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
+}
+
 function getAverageIntervalBetweenFeedings(feedingsArray) {
   // Filter out any feedings missing startTime or endTime
   const validFeedings = feedingsArray.filter(
@@ -417,4 +454,5 @@ module.exports = {
   getDailyStats,
   getTimePeriodStats,
   roundToNearestTenth,
+  getBabyAgeString,
 };

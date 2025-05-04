@@ -287,6 +287,14 @@ function getDailyStats(yesterday = false) {
         : changeTime >= mostRecentMidnight
   );
   const totalFeeds = groupedFeedings.length;
+  const totalBottleFeeds = groupedFeedings.filter(
+    (feeding) => feeding.side === 'bottle'
+  ).length;
+  const totalBottleFeedOunces = groupedFeedings
+    .filter((feeding) => feeding.side === 'bottle')
+    .reduce((acc, currFeed) => (acc += currFeed?.amountOz || 0), 0);
+  const averageBottleFeedOuncesPerFeed =
+    roundToNearestTenth(totalBottleFeedOunces / totalBottleFeeds) || 0;
   const averageTimeBetweenFeeds =
     getAverageIntervalBetweenFeedings(groupedFeedings);
   const { averageDuration: averageFeedingDuration } =
@@ -325,6 +333,9 @@ function getDailyStats(yesterday = false) {
     averageFeedingDuration,
     averageFeedingDurationLeft,
     averageFeedingDurationRight,
+    totalBottleFeeds,
+    totalBottleFeedOunces,
+    averageBottleFeedOuncesPerFeed,
     clusters,
     totalDiaperChanges,
     totalPees,
@@ -355,6 +366,17 @@ function getTimePeriodStats(numDays = 7) {
       changeTime >= midnightXDaysAgo && changeTime <= mostRecentMidnight
   );
   const totalFeeds = groupedFeedings.length;
+  const totalBottleFeeds = groupedFeedings.filter(
+    (feeding) => feeding.side === 'bottle'
+  ).length;
+  const totalBottleFeedOunces = groupedFeedings
+    .filter((feeding) => feeding.side === 'bottle')
+    .reduce((acc, currFeed) => (acc += currFeed?.amountOz || 0), 0);
+  const averageBottleFeedOuncesPerDay = roundToNearestTenth(
+    totalBottleFeedOunces / numDays
+  );
+  const averageBottleFeedOuncesPerFeed =
+    roundToNearestTenth(totalBottleFeedOunces / totalBottleFeeds) || 0;
   const averageFeedsPerDay = roundToNearestTenth(totalFeeds / numDays);
   const averageTimeBetweenFeeds =
     getAverageIntervalBetweenFeedings(groupedFeedings);
@@ -402,6 +424,9 @@ function getTimePeriodStats(numDays = 7) {
     averageFeedingDuration,
     averageFeedingDurationLeft,
     averageFeedingDurationRight,
+    totalBottleFeeds,
+    averageBottleFeedOuncesPerDay,
+    averageBottleFeedOuncesPerFeed,
     clusters,
     totalDiaperChanges,
     totalPees,

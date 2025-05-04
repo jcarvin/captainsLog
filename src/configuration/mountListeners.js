@@ -952,6 +952,9 @@ module.exports = () => {
               averageFeedingDuration,
               averageFeedingDurationLeft,
               averageFeedingDurationRight,
+              totalBottleFeeds,
+              totalBottleFeedOunces,
+              averageBottleFeedOuncesPerFeed,
               clusters,
               totalDiaperChanges,
               totalPees,
@@ -1008,6 +1011,20 @@ module.exports = () => {
                   value: clustersMessage,
                 },
                 { name: '\u200B', value: '\u200B' },
+                { name: 'Bottle feeding stats:', value: '' },
+                {
+                  name: 'Total bottle feeds',
+                  value: `${totalBottleFeeds}`,
+                },
+                {
+                  name: 'Total bottle feed ounces',
+                  value: `${totalBottleFeedOunces}oz`,
+                },
+                {
+                  name: 'Average ounces per feed',
+                  value: `${averageBottleFeedOuncesPerFeed}oz`,
+                },
+                { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
                 {
                   name: 'Total diaper changes since 12am',
@@ -1043,6 +1060,10 @@ module.exports = () => {
               averageFeedingDurationLeft: yesterday_averageFeedingDurationLeft,
               averageFeedingDurationRight:
                 yesterday_averageFeedingDurationRight,
+              totalBottleFeeds: yesterday_totalBottleFeeds,
+              totalBottleFeedOunces: yesterday_totalBottleFeedOunces,
+              averageBottleFeedOuncesPerFeed:
+                yesterday_averageBottleFeedOuncesPerFeed,
               totalDiaperChanges: yesterday_totalDiaperChanges,
               totalPees: yesterday_totalPees,
               totalPoops: yesterday_totalPoops,
@@ -1096,6 +1117,20 @@ module.exports = () => {
                   value: yesterdayClustersMessage,
                 },
                 { name: '\u200B', value: '\u200B' },
+                { name: 'Bottle feeding stats:', value: '' },
+                {
+                  name: 'Total bottle feeds',
+                  value: `${yesterday_totalBottleFeeds}`,
+                },
+                {
+                  name: 'Total bottle feed ounces',
+                  value: `${yesterday_totalBottleFeedOunces}oz`,
+                },
+                {
+                  name: 'Average ounces per feed',
+                  value: `${yesterday_averageBottleFeedOuncesPerFeed}oz`,
+                },
+                { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
                 {
                   name: 'Total diaper changes yesterday',
@@ -1134,6 +1169,11 @@ module.exports = () => {
                 lastSevenDays_averageFeedingDurationLeft,
               averageFeedingDurationRight:
                 lastSevenDays_averageFeedingDurationRight,
+              totalBottleFeeds: lastSevenDays_totalBottleFeeds,
+              averageBottleFeedOuncesPerDay:
+                lastSevenDays_averageBottleFeedOuncesPerDay,
+              averageBottleFeedOuncesPerFeed:
+                lastSevenDays_averageBottleFeedOuncesPerFeed,
               clusters: lastSevenDays_clusters,
               totalDiaperChanges: lastSevenDays_totalDiaperChanges,
               averageDiaperChangePerDay,
@@ -1197,6 +1237,20 @@ module.exports = () => {
                     ? 'Cluster feeding windows'
                     : '',
                   value: lastSevenDaysClustersMessage,
+                },
+                { name: '\u200B', value: '\u200B' },
+                { name: 'Bottle feeding stats:', value: '' },
+                {
+                  name: 'Total bottle feeds',
+                  value: `${lastSevenDays_totalBottleFeeds}`,
+                },
+                {
+                  name: 'Average bottle feed per day',
+                  value: `${lastSevenDays_averageBottleFeedOuncesPerDay}`,
+                },
+                {
+                  name: 'Average ounces per feed',
+                  value: `${lastSevenDays_averageBottleFeedOuncesPerFeed}oz`,
                 },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },

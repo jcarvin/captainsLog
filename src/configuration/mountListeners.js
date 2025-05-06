@@ -273,17 +273,32 @@ module.exports = () => {
               .setPlaceholder(`Roughly how many ounces did she eat?`)
               .addOptions(
                 new StringSelectMenuOptionBuilder()
+                  .setLabel('.5oz')
+                  .setValue('.5'),
+                new StringSelectMenuOptionBuilder()
                   .setLabel('1oz')
                   .setValue('1'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('1.5oz')
+                  .setValue('1.5'),
                 new StringSelectMenuOptionBuilder()
                   .setLabel('2oz')
                   .setValue('2'),
                 new StringSelectMenuOptionBuilder()
+                  .setLabel('2.5oz')
+                  .setValue('2.5'),
+                new StringSelectMenuOptionBuilder()
                   .setLabel('3oz')
                   .setValue('3'),
                 new StringSelectMenuOptionBuilder()
+                  .setLabel('3.5oz')
+                  .setValue('3.5'),
+                new StringSelectMenuOptionBuilder()
                   .setLabel('4oz')
                   .setValue('4'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('4.5oz')
+                  .setValue('4.5'),
                 new StringSelectMenuOptionBuilder()
                   .setLabel('5oz')
                   .setValue('5')
@@ -298,6 +313,27 @@ module.exports = () => {
             break;
           case 'bottleOzs':
             switch (interaction.values[0]) {
+              case '.5':
+                endTime = time;
+                amountOz = 0.5;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to .5oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
               case '1':
                 endTime = time;
                 amountOz = 1;
@@ -315,6 +351,27 @@ module.exports = () => {
                   content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
                     time
                   )} and set amount to 1oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              case '1.5':
+                endTime = time;
+                amountOz = 1.5;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 1.5oz. ${buildNextFeedTime(
                     feeding?.pauseTime || time
                   )}`,
                 });
@@ -340,6 +397,27 @@ module.exports = () => {
                   )}`,
                 });
                 break;
+              case '2.5':
+                endTime = time;
+                amountOz = 2.5;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 2.5oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
               case '3':
                 endTime = time;
                 amountOz = 3;
@@ -361,6 +439,27 @@ module.exports = () => {
                   )}`,
                 });
                 break;
+              case '3.5':
+                endTime = time;
+                amountOz = 3.5;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 3.5oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
               case '4':
                 endTime = time;
                 amountOz = 4;
@@ -378,6 +477,27 @@ module.exports = () => {
                   content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
                     time
                   )} and set amount to 4oz. ${buildNextFeedTime(
+                    feeding?.pauseTime || time
+                  )}`,
+                });
+                break;
+              case '4.5':
+                endTime = time;
+                amountOz = 4.5;
+                saveLog({
+                  feedings: {
+                    [feeding.startTime]: {
+                      ...feeding,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🍼 Ended bottle feeding at ${buildTimestamp(
+                    time
+                  )} and set amount to 4.5oz. ${buildNextFeedTime(
                     feeding?.pauseTime || time
                   )}`,
                 });

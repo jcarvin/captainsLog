@@ -13,6 +13,7 @@ const {
   saveLog,
   buildTimestamp,
   getMostRecentFeeding,
+  getMostRecentPump,
   getMostRecentSleep,
   getMostRecentMidnight,
   getAverageFeedingTimeBySide,
@@ -167,6 +168,7 @@ module.exports = () => {
   client.on('interactionCreate', async (interaction) => {
     const interactionType = InteractionType[interaction.type];
     const feeding = getMostRecentFeeding();
+    const pump = getMostRecentPump();
     const time = new Date().getTime();
     const side = feeding?.side;
     const averageFeedingTimeInMinutes = getAverageFeedingTimeBySide(side);
@@ -308,6 +310,57 @@ module.exports = () => {
             await interaction.channel.send({
               content: 'Set feeding amount',
               components: [ozRow],
+              withResponse: true,
+            });
+            break;
+          case 'pumpButton':
+            saveLog({
+              pumps: {
+                [time]: {
+                  startTime: time,
+                },
+              },
+            });
+            const pumpSelect = new StringSelectMenuBuilder()
+              .setCustomId('pumpOz')
+              .setPlaceholder(`Roughly how many ounces did you paump?`)
+              .addOptions(
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('.5oz')
+                  .setValue('.5'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('1oz')
+                  .setValue('1'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('1.5oz')
+                  .setValue('1.5'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('2oz')
+                  .setValue('2'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('2.5oz')
+                  .setValue('2.5'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('3oz')
+                  .setValue('3'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('3.5oz')
+                  .setValue('3.5'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('4oz')
+                  .setValue('4'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('4.5oz')
+                  .setValue('4.5'),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel('5oz')
+                  .setValue('5')
+              );
+            const pumpRow = new ActionRowBuilder().addComponents(pumpSelect);
+            await interaction.message.delete();
+            await interaction.channel.send({
+              content: 'Set pump amount',
+              components: [pumpRow],
               withResponse: true,
             });
             break;
@@ -521,6 +574,207 @@ module.exports = () => {
                   )} and set amount to 5oz. ${buildNextFeedTime(
                     feeding?.pauseTime || time
                   )}`,
+                });
+                break;
+              default:
+                console.log('Unknown value');
+                // await interaction.message.delete();
+                // await interaction.reply({
+                //   content: 'Unable to update the log 😞',
+                // });
+                break;
+            }
+            break;
+          case 'pumpOz':
+            switch (interaction.values[0]) {
+              case '.5':
+                endTime = time;
+                amountOz = 0.5;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to .5oz.`,
+                });
+                break;
+              case '1':
+                endTime = time;
+                amountOz = 1;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 1oz.`,
+                });
+                break;
+              case '1.5':
+                endTime = time;
+                amountOz = 1.5;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 1.5oz.`,
+                });
+                break;
+              case '2':
+                endTime = time;
+                amountOz = 2;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 2oz.`,
+                });
+                break;
+              case '2.5':
+                endTime = time;
+                amountOz = 2.5;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 2.5oz.`,
+                });
+                break;
+              case '3':
+                endTime = time;
+                amountOz = 3;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 3oz.`,
+                });
+                break;
+              case '3.5':
+                endTime = time;
+                amountOz = 3.5;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 3.5oz.`,
+                });
+                break;
+              case '4':
+                endTime = time;
+                amountOz = 4;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 4oz.`,
+                });
+                break;
+              case '4.5':
+                endTime = time;
+                amountOz = 4.5;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 4.5oz.`,
+                });
+                break;
+              case '5':
+                endTime = time;
+                amountOz = 5;
+                saveLog({
+                  pumps: {
+                    [pump.startTime]: {
+                      ...pump,
+                      endTime,
+                      amountOz,
+                    },
+                  },
+                });
+                await interaction.message.delete();
+                await interaction.channel.send({
+                  content: `🏁🐄 Logged pump at ${buildTimestamp(
+                    time
+                  )} and set amount to 5oz.`,
                 });
                 break;
               default:
@@ -1074,6 +1328,7 @@ module.exports = () => {
               averageFeedingDurationRight,
               totalBottleFeeds,
               totalBottleFeedOunces,
+              totalOuncesPumped,
               averageBottleFeedOuncesPerFeed,
               clusters,
               totalDiaperChanges,
@@ -1144,6 +1399,10 @@ module.exports = () => {
                   name: 'Average ounces per feed',
                   value: `${averageBottleFeedOuncesPerFeed}oz`,
                 },
+                {
+                  name: 'Total ounces pumped',
+                  value: `${totalOuncesPumped}oz`,
+                },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
                 {
@@ -1182,6 +1441,7 @@ module.exports = () => {
                 yesterday_averageFeedingDurationRight,
               totalBottleFeeds: yesterday_totalBottleFeeds,
               totalBottleFeedOunces: yesterday_totalBottleFeedOunces,
+              totalOuncesPumped: yesterday_totalOuncesPumped,
               averageBottleFeedOuncesPerFeed:
                 yesterday_averageBottleFeedOuncesPerFeed,
               totalDiaperChanges: yesterday_totalDiaperChanges,
@@ -1250,6 +1510,10 @@ module.exports = () => {
                   name: 'Average ounces per feed',
                   value: `${yesterday_averageBottleFeedOuncesPerFeed}oz`,
                 },
+                {
+                  name: 'Total ounces pumped',
+                  value: `${yesterday_totalOuncesPumped}oz`,
+                },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },
                 {
@@ -1292,6 +1556,8 @@ module.exports = () => {
               totalBottleFeeds: lastSevenDays_totalBottleFeeds,
               averageBottleFeedOuncesPerDay:
                 lastSevenDays_averageBottleFeedOuncesPerDay,
+              totalOuncesPumped: lastSevenDays_totalOuncesPumped,
+              averageOuncesPumped,
               averageBottleFeedOuncesPerFeed:
                 lastSevenDays_averageBottleFeedOuncesPerFeed,
               clusters: lastSevenDays_clusters,
@@ -1371,6 +1637,10 @@ module.exports = () => {
                 {
                   name: 'Average ounces per feed',
                   value: `${lastSevenDays_averageBottleFeedOuncesPerFeed}oz`,
+                },
+                {
+                  name: 'Average ounces pumped per day',
+                  value: `${averageOuncesPumped}oz`,
                 },
                 { name: '\u200B', value: '\u200B' },
                 { name: 'Diaper stats:', value: '' },

@@ -13,7 +13,7 @@ function loadLogs() {
   if (!fs.existsSync(dataPath)) {
     fs.writeFileSync(
       dataPath,
-      '{"diaperChanges": {}, "feedings": {}, "fusses": {}, "sleeps": {}}'
+      '{"diaperChanges": {}, "feedings": {}, "fusses": {}, "sleeps": {}, "pumps": {}}'
     );
   }
 
@@ -91,6 +91,13 @@ function getMostRecentFeeding() {
   const { feedings } = loadLogs();
   const mostRecentTimestamp = Math.max(...Object.keys(feedings));
   return feedings[mostRecentTimestamp];
+}
+
+function getMostRecentPump() {
+  const { pumps } = loadLogs();
+  if (!pumps) return {};
+  const mostRecentTimestamp = Math.max(...Object.keys(pumps));
+  return pumps[mostRecentTimestamp];
 }
 
 function getMostRecentSleep() {
@@ -272,12 +279,18 @@ function getDailyStats(yesterday = false) {
     now.getDate() - 1
   );
   const mostRecentMidnight = getMostRecentMidnight();
-  const { feedings, diaperChanges } = loadLogs();
+  const { feedings, diaperChanges, pumps } = loadLogs();
   const relevantFeedings = Object.values(feedings).filter((feeding) =>
     yesterday
       ? feeding.startTime >= yesterdaysMidnight &&
         feeding.startTime <= mostRecentMidnight
       : feeding.startTime >= mostRecentMidnight
+  );
+  const relevantPumps = Object.values(pumps).filter((pump) =>
+    yesterday
+      ? pump.startTime >= yesterdaysMidnight &&
+        pump.startTime <= mostRecentMidnight
+      : pump.startTime >= mostRecentMidnight
   );
   const groupedFeedings = groupFeedings(relevantFeedings);
   const relevantDiaperChanges = Object.keys(diaperChanges).filter(
@@ -304,6 +317,11 @@ function getDailyStats(yesterday = false) {
   const { averageDuration: averageFeedingDurationRight } =
     getAverageFeedingDuration(relevantFeedings, 'right');
   const clusters = findClusterFeedingWindows(groupedFeedings);
+
+  const totalOuncesPumped = relevantPumps.reduce(
+    (acc, currPump) => (acc += currPump?.amountOz || 0),
+    0
+  );
 
   const totalDiaperChanges = relevantDiaperChanges.length;
   const totalPees = relevantDiaperChanges.filter(
@@ -335,6 +353,7 @@ function getDailyStats(yesterday = false) {
     averageFeedingDurationRight,
     totalBottleFeeds,
     totalBottleFeedOunces,
+    totalOuncesPumped,
     averageBottleFeedOuncesPerFeed,
     clusters,
     totalDiaperChanges,
@@ -354,11 +373,15 @@ function getTimePeriodStats(numDays = 7) {
 
   const startDay = `${midnightXDaysAgo.getMonth()}/${midnightXDaysAgo.getDate()}/${midnightXDaysAgo.getFullYear()}`;
   const endDay = `${mostRecentMidnight.getMonth()}/${mostRecentMidnight.getDate()}/${mostRecentMidnight.getFullYear()}`;
-  const { feedings, diaperChanges } = loadLogs();
+  const { feedings, diaperChanges, pumps } = loadLogs();
   const relevantFeedings = Object.values(feedings).filter(
     (feeding) =>
       feeding.startTime >= midnightXDaysAgo &&
       feeding.startTime <= mostRecentMidnight
+  );
+  const relevantPumps = Object.values(pumps).filter(
+    (pump) =>
+      pump.startTime >= midnightXDaysAgo && pump.startTime <= mostRecentMidnight
   );
   const groupedFeedings = groupFeedings(relevantFeedings);
   const relevantDiaperChanges = Object.keys(diaperChanges).filter(
@@ -375,6 +398,13 @@ function getTimePeriodStats(numDays = 7) {
   const averageBottleFeedOuncesPerDay = roundToNearestTenth(
     totalBottleFeedOunces / numDays
   );
+
+  const totalOuncesPumped = relevantPumps.reduce(
+    (acc, currPump) => (acc += currPump?.amountOz || 0),
+    0
+  );
+  const averageOuncesPumped = roundToNearestTenth(totalOuncesPumped / numDays);
+
   const averageBottleFeedOuncesPerFeed =
     roundToNearestTenth(totalBottleFeedOunces / totalBottleFeeds) || 0;
   const averageFeedsPerDay = roundToNearestTenth(totalFeeds / numDays);
@@ -426,6 +456,8 @@ function getTimePeriodStats(numDays = 7) {
     averageFeedingDurationRight,
     totalBottleFeeds,
     averageBottleFeedOuncesPerDay,
+    totalOuncesPumped,
+    averageOuncesPumped,
     averageBottleFeedOuncesPerFeed,
     clusters,
     totalDiaperChanges,
@@ -457,12 +489,13 @@ function getAverageFeedingTimeBySide(side) {
 }
 
 function saveLog(entry) {
-  const { diaperChanges, feedings, fusses, sleeps } = loadLogs();
+  const { diaperChanges, feedings, fusses, sleeps, pumps } = loadLogs();
   const newLogs = {
     diaperChanges: { ...diaperChanges, ...entry.diaperChanges },
     feedings: { ...feedings, ...entry.feedings },
     fusses: { ...(fusses || {}), ...entry.fusses },
     sleeps: { ...(sleeps || {}), ...entry.sleeps },
+    pumps: { ...(pumps || {}), ...entry.pumps },
   };
   fs.writeFileSync(dataPath, JSON.stringify(newLogs, null, 2));
 }
@@ -472,6 +505,7 @@ module.exports = {
   buildTimestamp,
   saveLog,
   getMostRecentFeeding,
+  getMostRecentPump,
   getMostRecentSleep,
   getAverageFeedingTimeBySide,
   getMostRecentMidnight,

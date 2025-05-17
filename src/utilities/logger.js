@@ -300,10 +300,10 @@ function getDailyStats(yesterday = false) {
         : changeTime >= mostRecentMidnight
   );
   const totalFeeds = groupedFeedings.length;
-  const totalBottleFeeds = groupedFeedings.filter(
+  const totalBottleFeeds = relevantFeedings.filter(
     (feeding) => feeding.side === 'bottle'
   ).length;
-  const totalBottleFeedOunces = groupedFeedings
+  const totalBottleFeedOunces = relevantFeedings
     .filter((feeding) => feeding.side === 'bottle')
     .reduce((acc, currFeed) => (acc += currFeed?.amountOz || 0), 0);
   const averageBottleFeedOuncesPerFeed =
@@ -389,10 +389,10 @@ function getTimePeriodStats(numDays = 7) {
       changeTime >= midnightXDaysAgo && changeTime <= mostRecentMidnight
   );
   const totalFeeds = groupedFeedings.length;
-  const totalBottleFeeds = groupedFeedings.filter(
+  const totalBottleFeeds = relevantFeedings.filter(
     (feeding) => feeding.side === 'bottle'
   ).length;
-  const totalBottleFeedOunces = groupedFeedings
+  const totalBottleFeedOunces = relevantFeedings
     .filter((feeding) => feeding.side === 'bottle')
     .reduce((acc, currFeed) => (acc += currFeed?.amountOz || 0), 0);
   const averageBottleFeedOuncesPerDay = roundToNearestTenth(

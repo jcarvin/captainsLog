@@ -236,7 +236,7 @@ function getAverageFeedingDuration(feedingsArray, sideFilter = null) {
 }
 
 function getMostRecentMidnight() {
-  //  const now = new Date();
+  const now = new Date();
   const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   midnight.setHours(midnight.getHours() + 1); // add 1 hour to adjust for thicks timezone
   return midnight;

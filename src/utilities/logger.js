@@ -238,7 +238,7 @@ function getAverageFeedingDuration(feedingsArray, sideFilter = null) {
 function getMostRecentMidnight() {
   const now = new Date();
   const midnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  // midnight.setHours(midnight.getHours() + 1); // add 1 hour to adjust for thicks timezone
+  midnight.setHours(midnight.getHours() - 1); // add 1 hour to adjust for thicks timezone
   return midnight;
 }
 
@@ -379,7 +379,7 @@ function getTimePeriodStats(numDays = 7) {
     now.getMonth(),
     now.getDate() - numDays
   );
-  // midnightXDaysAgo.setHours(midnightXDaysAgo.getHours() + 1);
+  // midnightXDaysAgo.setHours(midnightXDaysAgo.getHours() - 1);
 
   const startDay = `${midnightXDaysAgo.getMonth()}/${midnightXDaysAgo.getDate()}/${midnightXDaysAgo.getFullYear()}`;
   const endDay = `${mostRecentMidnight.getMonth()}/${mostRecentMidnight.getDate()}/${mostRecentMidnight.getFullYear()}`;

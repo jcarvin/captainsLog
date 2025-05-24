@@ -295,7 +295,12 @@ function getDailyStats(yesterday = false) {
         pump.startTime <= mostRecentMidnight
       : pump.startTime >= mostRecentMidnight
   );
-  console.log('relevant pumps ', relevantPumps);
+  console.log(
+    'relevant pumps ',
+    relevantPumps,
+    mostRecentMidnight,
+    buildTimestamp(mostRecentMidnight)
+  );
   const groupedFeedings = groupFeedings(relevantFeedings);
   const relevantDiaperChanges = Object.keys(diaperChanges).filter(
     (changeTime) =>

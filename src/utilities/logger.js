@@ -251,10 +251,10 @@ function groupFeedings(feedingsArray) {
     // replace the previous end time with this end time
     // and add the delta to the deductions
 
-    const sevenMinutes = 7 * 60 * 1000;
+    const gapThreshold = currVal.amountOz ? 60 * 60 * 1000 : 7 * 60 * 1000;
     const lastVal = acc[acc.length - 1];
 
-    if (currVal.startTime - lastVal.endTime <= sevenMinutes) {
+    if (currVal.startTime - lastVal.endTime <= gapThreshold) {
       const newAccumulator = [...acc]; // Create a copy to avoid mutation
       newAccumulator.pop();
       newAccumulator.push({

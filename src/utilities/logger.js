@@ -122,39 +122,70 @@ function buildDuration(timeMs) {
 
   return parts.join(' and ');
 }
-
 function getBabyAgeString(birthDateStr = '2025-04-11') {
   const birthDate = new Date(birthDateStr);
   const now = new Date();
 
-  // Calculate calendar months difference
+  // Calculate total months difference
   let months =
     (now.getFullYear() - birthDate.getFullYear()) * 12 +
     (now.getMonth() - birthDate.getMonth());
 
-  // Handle incomplete current month
   const birthDay = birthDate.getDate();
   if (now.getDate() < birthDay) {
     months--;
   }
 
-  // Calculate date after subtracting full months
   const monthAdjustedDate = new Date(birthDate);
   monthAdjustedDate.setMonth(birthDate.getMonth() + months);
 
-  // Calculate remaining days
   const diffMs = now - monthAdjustedDate;
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
   const weeks = Math.floor(diffDays / 7);
   const days = diffDays % 7;
 
-  // Format parts
+  const totalDays = Math.floor((now - birthDate) / (1000 * 60 * 60 * 24));
+  const totalWeeks = Math.floor(totalDays / 7);
+  const totalYears = Math.floor(months / 12);
+
+  // LESS THAN 6 MONTHS → weeks and days only
+  if (months < 6) {
+    const weeksOnly = Math.floor(totalDays / 7);
+    const remainingDays = totalDays % 7;
+
+    const parts = [];
+    if (weeksOnly > 0)
+      parts.push(`${weeksOnly} ${weeksOnly === 1 ? 'week' : 'weeks'}`);
+    if (remainingDays > 0)
+      parts.push(`${remainingDays} ${remainingDays === 1 ? 'day' : 'days'}`);
+    return parts.length > 0 ? parts.join(' and ') : '0 days';
+  }
+
+  // 6 MONTHS TO LESS THAN 2 YEARS → months, weeks, and days (no years)
+  if (months < 24) {
+    const parts = [];
+    if (months > 0)
+      parts.push(`${months} ${months === 1 ? 'month' : 'months'}`);
+    if (weeks > 0) parts.push(`${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
+    if (days > 0) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+    if (parts.length === 0) return '0 days';
+    if (parts.length === 1) return parts[0];
+    return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
+  }
+
+  // 2 YEARS AND OLDER → years, months, weeks, and days
+  const years = Math.floor(months / 12);
+  const remainingMonths = months % 12;
+
   const parts = [];
-  if (months > 0) parts.push(`${months} ${months === 1 ? 'month' : 'months'}`);
+  if (years > 0) parts.push(`${years} ${years === 1 ? 'year' : 'years'}`);
+  if (remainingMonths > 0)
+    parts.push(
+      `${remainingMonths} ${remainingMonths === 1 ? 'month' : 'months'}`
+    );
   if (weeks > 0) parts.push(`${weeks} ${weeks === 1 ? 'week' : 'weeks'}`);
   if (days > 0) parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
 
-  // Join parts with commas and "and"
   if (parts.length === 0) return '0 days';
   if (parts.length === 1) return parts[0];
   return parts.slice(0, -1).join(', ') + ', and ' + parts[parts.length - 1];
